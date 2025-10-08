@@ -1,11 +1,12 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-require('dotenv').config();
+
+process.loadEnvFile();
 
 const PORT = process.env.PORT || 3000;
-const app = express();
 
+const app = express();
 // Habilita CORS para todas las rutas
 app.use(cors());
 // Permite procesar cuerpos JSON y cabeceras en las peticiones
