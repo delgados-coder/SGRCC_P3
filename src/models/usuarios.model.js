@@ -25,3 +25,5 @@ const m_SELECT_JOIN = (columnas = '*', joins = [], filtros = {}, orden = '', lim
 };
 
 module.exports = { m_SELECT, m_INSERT, m_UPDATE, m_DELETE, m_SELECT_JOIN };
+
+// Modificación de verificación por Ileana Nieto - 09/10/2025
