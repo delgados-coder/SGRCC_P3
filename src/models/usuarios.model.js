@@ -1,5 +1,7 @@
 const base = require('./BASE/base.model.js');
 
+// Este modelo define las operaciones CRUD específicas para la tabla 'usuarios' usando los métodos genéricos de base.model.js
+
 const TABLA = 'usuarios';
 
 const m_SELECT = (columnas = '*', filtros = {}, orden = '', limite = '') => {
