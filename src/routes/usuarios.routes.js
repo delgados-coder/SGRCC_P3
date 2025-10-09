@@ -1,3 +1,5 @@
+// Módulo de rutas de usuarios
+
 const express = require('express');
 const router = express.Router();
 const usuariosController = require('../controllers/usuarios.controller.js');
