@@ -1,3 +1,5 @@
+// Módulo de rutas de reservas
+
 const express = require('express');
 const router = express.Router();
 const reservasController = require('../controllers/reservas.controller.js');
