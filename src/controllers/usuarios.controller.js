@@ -1,3 +1,4 @@
+// Controlador de usuarios: gestiona altas, bajas, modificaciones y consultas
 
 const usuariosModel = require('../models/usuarios.model.js');
 
