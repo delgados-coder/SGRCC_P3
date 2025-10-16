@@ -26,7 +26,7 @@
   👥 **Integrantes:**  
   
   - ![Programador 1](https://img.shields.io/badge/Programadora-FullStack-orange?style=for-the-badge&logo=node.js&logoColor=white)👉[Moyano, Laura](https://github.com/laura-m-stack)     
-  - ![Programador 2](https://img.shields.io/badge/Programadora-FullStack-purple?style=for-the-badge&logo=javascript&logoColor=white)👉[López Nieto, Ileana](https://github.com/IleanaNieto)
+  - ![Programador 2](https://img.shields.io/badge/Programadora-FullStack-purple?style=for-the-badge&logo=javascript&logoColor=white)👉[Nieto López, Ileana](https://github.com/IleanaNieto)
   - ![Programador 3](https://img.shields.io/badge/Programador-FullStack-blue?style=for-the-badge&logo=node.js&logoColor=white)👉[Jerez, Pablo Agustin](https://github.com/punkscode)     
   - ![Programador 4](https://img.shields.io/badge/Programador-FullStack-red?style=for-the-badge&logo=javascript&logoColor=white)👉[Delgado Coman, Santiago](https://github.com/delgados-coder)
 
