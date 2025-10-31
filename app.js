@@ -37,6 +37,10 @@ app.use('/api/servicios', require('./routes/servicios.routes.js'));
 app.use('/api/turnos', require('./routes/turnos.routes.js'));
 app.use('/api/reservas', require('./routes/reservas.routes.js'));
 
+// Rutas de estadísticas
+// Las estadísticas se generan exclusivamente mediante stored procedures.
+app.use('/api/estadisticas', require('./routes/estadisticas.routes.js'));
+
 // Ruta no encontrada (404)
 app.use(notFoundMiddleware.error_notFound);
 
