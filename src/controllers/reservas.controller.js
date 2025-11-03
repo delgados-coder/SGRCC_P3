@@ -1,5 +1,5 @@
 /**
-* Controlador de resevas
+* Controlador de reservas
 *
 * Éste módulo gestiona todas las operaciones relacionadas con las reservas, incluyendo la obtención 
 * de datos (simples y con joins), creación, edición, eliminación y generación de reportes PDF detallados
