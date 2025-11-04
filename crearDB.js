@@ -1,12 +1,19 @@
 const mysql = require('mysql2');
 
+// Cargar .env
+process.loadEnvFile();
+
 const DB_connection = mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: '',
+  host: process.env.DB_HOST,            // localhost
+  port: process.env.DB_PORT,            // 3306
+  user: process.env.DB_USER,            // sgrcc_api
+  password: process.env.DB_PASS,        // GF&R/&RFu6fihvhj98
+  multipleStatements: true,
 });
 
-const crearDB = `CREATE DATABASE IF NOT EXISTS sgrcc_db;`;
+const crearDB = `CREATE DATABASE IF NOT EXISTS \`${process.env.DB_NAME || 'sgrcc_db'}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`;
+
+const usarDB = `USE \`${process.env.DB_NAME || 'sgrcc_db'}\`;`;
 
 const crearTablas = [
   `CREATE TABLE \`reservas\` (
@@ -82,12 +89,12 @@ const crearTablas = [
 ]
 
 const insertarDatos = [
-`INSERT INTO \`reservas\` (\`reserva_id\`, \`fecha_reserva\`, \`salon_id\`, \`usuario_id\`, \`turno_id\`, \`foto_cumpleaniero\`, \`tematica\`, \`importe_salon\`, \`importe_total\`, \`activo\`, \`creado\`, \`modificado\`) VALUES
+  `INSERT INTO \`reservas\` (\`reserva_id\`, \`fecha_reserva\`, \`salon_id\`, \`usuario_id\`, \`turno_id\`, \`foto_cumpleaniero\`, \`tematica\`, \`importe_salon\`, \`importe_total\`, \`activo\`, \`creado\`, \`modificado\`) VALUES
 (1, '2025-10-08', 1, 1, 1, NULL, 'Plim plim', NULL, 200000.00, 1, '2025-08-19 22:02:33', '2025-08-19 22:02:33'),
 (2, '2025-10-08', 2, 1, 1, NULL, 'Messi', NULL, 100000.00, 1, '2025-08-19 22:03:45', '2025-08-19 22:03:45'),
 (3, '2025-10-08', 2, 2, 1, NULL, 'Palermo', NULL, 500000.00, 1, '2025-08-19 22:03:45', '2025-08-19 22:03:45');`,
 
-`INSERT INTO \`reservas_servicios\` (\`reserva_servicio_id\`, \`reserva_id\`, \`servicio_id\`, \`importe\`, \`creado\`, \`modificado\`) VALUES
+  `INSERT INTO \`reservas_servicios\` (\`reserva_servicio_id\`, \`reserva_id\`, \`servicio_id\`, \`importe\`, \`creado\`, \`modificado\`) VALUES
 (1, 1, 1, 50000.00, '2025-08-19 22:07:31', '2025-08-19 22:07:31'),
 (2, 1, 2, 50000.00, '2025-08-19 22:07:31', '2025-08-19 22:07:31'),
 (3, 1, 3, 50000.00, '2025-08-19 22:07:31', '2025-08-19 22:07:31'),
@@ -191,54 +198,42 @@ const alterTables = [
   `COMMIT;`
 ];
 
-DB_connection.query(crearDB, function (err, results) {
+DB_connection.query(crearDB, function (err) {
   if (err) {
     console.error('Error creando la base de datos: ', err);
     return;
   }
   console.log('Base de datos creada o ya existente.');
 
-  DB_connection.query("USE sgrcc_db;", function (err, results) {
+  DB_connection.query(usarDB, function (err) {
     if (err) {
       console.error('Error al seleccionar la base de datos: ', err);
       return;
     }
 
     for (const tablaQuery of crearTablas) {
-      DB_connection.query(tablaQuery, function (err, results) {
-        if (err) {
-          console.error('Error creando las tablas: ', err);
-          return;
-        }
+      DB_connection.query(tablaQuery, function (err) {
+        if (err) { console.error('Error creando tablas:', err); return; }
         console.log('Tabla creada correctamente.');
       });
     }
 
     for (const insertQuery of insertarDatos) {
-      DB_connection.query(insertQuery, function (err, results) {
-        if (err) {
-          console.error('Error insertando datos: ', err);
-          return;
-        }
+      DB_connection.query(insertQuery, function (err) {
+        if (err) { console.error('Error insertando datos:', err); return; }
         console.log('Datos insertados correctamente.');
       });
     }
 
-    for (const insertQuery of alterTables) {
-      DB_connection.query(insertQuery, function (err, results) {
-        if (err) {
-          console.error('Error insertar ALTER: ', err);
-          return;
-        }
-        console.log('Claves Foraneas EXITOOOOO.');
+    for (const alterQuery of alterTables) {
+      DB_connection.query(alterQuery, function (err) {
+        if (err) { console.error('Error en ALTER:', err); return; }
+        console.log('ALTER ejecutado correctamente.');
       });
     }
 
     DB_connection.end(function (err) {
-      if (err) {
-        console.error('Error al cerrar la conexión: ', err);
-        return;
-      }
+      if (err) { console.error('Error al cerrar conexión: ', err); return; }
       console.log('Conexión cerrada correctamente.');
     });
   });
