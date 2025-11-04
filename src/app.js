@@ -40,6 +40,11 @@ app.use('/api/reservas', require('./routes/reservas.routes.js'));
 // Rutas de estadísticas
 // Las estadísticas se generan exclusivamente mediante stored procedures.
 app.use('/api/estadisticas', require('./routes/estadisticas.routes.js'));
+// ----------------------
+// Documentación Swagger
+// ----------------------
+const setupSwagger = require('./docs/swagger');
+setupSwagger(app);
 
 // Ruta no encontrada (404)
 app.use(notFoundMiddleware.error_notFound);

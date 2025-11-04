@@ -1,3 +1,12 @@
+/**
+* Controlador de reservas
+*
+* Éste módulo gestiona todas las operaciones relacionadas con las reservas, incluyendo la obtención 
+* de datos (simples y con joins), creación, edición, eliminación y generación de reportes PDF detallados
+* de una reserva específica.
+*/
+
+
 const PDFDocument = require('pdfkit');
 const usuariosModel = require('../models/usuarios.model.js');
 const turnosModel = require('../models/turnos.model.js');
