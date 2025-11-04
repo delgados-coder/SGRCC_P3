@@ -26,7 +26,7 @@
   👥 **Integrantes:**  
   
   - ![Programador 1](https://img.shields.io/badge/Programadora-FullStack-orange?style=for-the-badge&logo=node.js&logoColor=white)👉[Moyano, Laura](https://github.com/laura-m-stack)     
-  - ![Programador 2](https://img.shields.io/badge/Programadora-FullStack-purple?style=for-the-badge&logo=javascript&logoColor=white)👉[López Nieto, Ileana](https://github.com/IleanaNieto)
+  - ![Programador 2](https://img.shields.io/badge/Programadora-FullStack-purple?style=for-the-badge&logo=javascript&logoColor=white)👉[Nieto López, Ileana](https://github.com/IleanaNieto)
   - ![Programador 3](https://img.shields.io/badge/Programador-FullStack-blue?style=for-the-badge&logo=node.js&logoColor=white)👉[Jerez, Pablo Agustin](https://github.com/punkscode)     
   - ![Programador 4](https://img.shields.io/badge/Programador-FullStack-red?style=for-the-badge&logo=javascript&logoColor=white)👉[Delgado Coman, Santiago](https://github.com/delgados-coder)
 
@@ -337,7 +337,78 @@ Arquitectura **MVC** con **Express + MySQL2**.
   
   
 </details>
-  
+
+### ✅ Validaciones con Express Validator
+<details>
+<summary> ←VER→ </summary>
+
+Se implementó [`express-validator`](https://express-validator.github.io/docs/) **en las rutas** para validar la información entrante **antes de llegar a los controladores**, tal como se explicó en clase.  
+Los errores se centralizan mediante el middleware `validation.middleware.js`, devolviendo código **400** junto con los mensajes de error correspondientes.
+
+---
+
+#### 🧩 Middleware de validación
+```js
+// src/middlewares/validation.middleware.js
+const { validationResult } = require('express-validator');
+
+module.exports = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+  next();
+};
+```
+
+---
+
+#### 🧱 Ejemplo aplicado (POST /api/salones)
+```js
+const { check } = require('express-validator');
+const validation = require('../middlewares/validation.middleware');
+const authRole = require('../middlewares/authRole.middleware');
+const salonesController = require('../controllers/salones.controller');
+
+router.post(
+  '/',
+  [
+    authRole(['empleado','administrador']),
+    check('titulo').notEmpty().withMessage('El título es obligatorio'),
+    check('direccion').notEmpty().withMessage('La dirección es obligatoria'),
+    check('capacidad').isInt({ min: 1 }).withMessage('La capacidad debe ser un número entero positivo'),
+    check('importe').isFloat({ min: 0 }).withMessage('El importe debe ser un número válido'),
+    check('latitud').optional({ nullable: true }).isFloat().withMessage('Latitud inválida'),
+    check('longitud').optional({ nullable: true }).isFloat().withMessage('Longitud inválida'),
+  ],
+  validation,
+  salonesController.c_Add
+);
+```
+
+---
+
+#### 📋 Cobertura de validaciones
+
+| **Módulo** | **Campos validados** | **Reglas principales** |
+|-------------|----------------------|-------------------------|
+| **Auth** | `nombre_usuario`, `contrasenia`, `tipo_usuario`, `nombre`, `apellido` | `isEmail`, `notEmpty`, `isLength`, `isIn(['cliente','empleado','administrador'])` |
+| **Usuarios** | Todos los CRUD + `id_usuario` | `param('id_usuario').isInt()`, `check(...).notEmpty()` / `isEmail()` |
+| **Salones** | `titulo`, `direccion`, `capacidad`, `importe`, `latitud?`, `longitud?` | `notEmpty`, `isInt({min:1})`, `isFloat({min:0})`, `optional().isFloat()` |
+| **Servicios** | `descripcion`, `importe` | `notEmpty`, `isFloat({min:0})` |
+| **Turnos** | `orden`, `hora_desde`, `hora_hasta` | `isInt({min:1})`, `matches(/^\d{2}:\d{2}:\d{2}$/)` y validación cruzada en controlador |
+| **Reservas** | `fecha_reserva`, `salon_id`, `usuario_id`, `turno_id`, `tematica?`, `importe_total?` | `isISO8601()`, `isInt({min:1})`, `optional().isFloat({min:0})` |
+
+---
+
+#### 💡 Beneficios
+
+- Se separa la responsabilidad de **validar** (rutas) de la de **procesar** (controladores).  
+- Previene el ingreso de datos incompletos o con formato inválido.  
+- Cumple con el patrón **MVC** y las buenas prácticas explicadas por la cátedra.  
+- Mantiene el mismo enfoque que el ejemplo trabajado en clase por el profesor *Cristian Faure*.  
+
+
+</details>
+
 ---
 
 </details>

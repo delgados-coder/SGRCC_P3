@@ -7,7 +7,8 @@
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
     "db": "node crearDB.js",
-    "client": "node z_ClienteFicticioDePrueba/cliente.js"
+    "client": "node z_ClienteFicticioDePrueba/cliente.js",
+    "client:validator": "node z_ClienteFicticioDePrueba/cliente_validator.js"
   },
   "keywords": [],
   "author": "Moyano, Laura - Nieto, Ileana - Jerez, Pablo Agustin - Delgado, Santiago G.",
