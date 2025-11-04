@@ -6,7 +6,8 @@ const connection = mysql.createConnection({
   port: env.DB_PORT,
   user: env.DB_USER,
   password: env.DB_PASS,
-  database: env.DB_NAME
+  database: env.DB_NAME,
+  multipleStatements: true //Para + de una consulta a la vez
 });
 
 connection.connect((err) => {

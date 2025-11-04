@@ -89,12 +89,14 @@ const crearTablas = [
 ]
 
 const insertarDatos = [
-  `INSERT INTO \`reservas\` (\`reserva_id\`, \`fecha_reserva\`, \`salon_id\`, \`usuario_id\`, \`turno_id\`, \`foto_cumpleaniero\`, \`tematica\`, \`importe_salon\`, \`importe_total\`, \`activo\`, \`creado\`, \`modificado\`) VALUES
+`INSERT INTO \`reservas\` (\`reserva_id\`, \`fecha_reserva\`, \`salon_id\`, \`usuario_id\`, \`turno_id\`, \`foto_cumpleaniero\`, \`tematica\`, \`importe_salon\`, \`importe_total\`, \`activo\`, \`creado\`, \`modificado\`) VALUES
+=======
 (1, '2025-10-08', 1, 1, 1, NULL, 'Plim plim', NULL, 200000.00, 1, '2025-08-19 22:02:33', '2025-08-19 22:02:33'),
 (2, '2025-10-08', 2, 1, 1, NULL, 'Messi', NULL, 100000.00, 1, '2025-08-19 22:03:45', '2025-08-19 22:03:45'),
 (3, '2025-10-08', 2, 2, 1, NULL, 'Palermo', NULL, 500000.00, 1, '2025-08-19 22:03:45', '2025-08-19 22:03:45');`,
 
-  `INSERT INTO \`reservas_servicios\` (\`reserva_servicio_id\`, \`reserva_id\`, \`servicio_id\`, \`importe\`, \`creado\`, \`modificado\`) VALUES
+`INSERT INTO \`reservas_servicios\` (\`reserva_servicio_id\`, \`reserva_id\`, \`servicio_id\`, \`importe\`, \`creado\`, \`modificado\`) VALUES
+=======
 (1, 1, 1, 50000.00, '2025-08-19 22:07:31', '2025-08-19 22:07:31'),
 (2, 1, 2, 50000.00, '2025-08-19 22:07:31', '2025-08-19 22:07:31'),
 (3, 1, 3, 50000.00, '2025-08-19 22:07:31', '2025-08-19 22:07:31'),
@@ -198,6 +200,129 @@ const alterTables = [
   `COMMIT;`
 ];
 
+// Procedimientos almacenados para estadísticas (cada sentencia se envía por separado)
+const crearProcedimientos = [
+  // Media del importe_total en reservas activas
+  `DROP PROCEDURE IF EXISTS sp_media_importe_total`,
+  `CREATE PROCEDURE sp_media_importe_total()
+BEGIN
+    SELECT AVG(importe_total) AS media
+    FROM reservas
+    WHERE activo = 1
+      AND importe_total IS NOT NULL;
+END`,
+
+  // Mediana del importe_total en reservas activas
+  `DROP PROCEDURE IF EXISTS sp_mediana_importe_total`,
+  `CREATE PROCEDURE sp_mediana_importe_total()
+BEGIN
+    DECLARE row_count INT;
+    DECLARE median_val DECIMAL(10,2);
+
+    SELECT COUNT(*) INTO row_count
+    FROM reservas
+    WHERE activo = 1
+      AND importe_total IS NOT NULL;
+
+    IF row_count = 0 THEN
+        SET median_val = NULL;
+    ELSEIF MOD(row_count, 2) = 1 THEN
+        SELECT importe_total INTO median_val
+        FROM reservas
+        WHERE activo = 1
+          AND importe_total IS NOT NULL
+        ORDER BY importe_total
+        LIMIT FLOOR(row_count / 2), 1;
+    ELSE
+        SELECT AVG(sub.import_val) INTO median_val
+        FROM (
+            SELECT importe_total AS import_val
+            FROM reservas
+            WHERE activo = 1
+              AND importe_total IS NOT NULL
+            ORDER BY importe_total
+            LIMIT row_count / 2 - 1, 2
+        ) AS sub;
+    END IF;
+
+    SELECT median_val AS mediana;
+END`,
+
+  // Moda del importe_total en reservas activas
+  `DROP PROCEDURE IF EXISTS sp_moda_importe_total`,
+  `CREATE PROCEDURE sp_moda_importe_total()
+BEGIN
+    DECLARE mode_val DECIMAL(10,2);
+    DECLARE freq INT;
+
+    SELECT importe_total, COUNT(*)
+    INTO mode_val, freq
+    FROM reservas
+    WHERE activo = 1
+      AND importe_total IS NOT NULL
+    GROUP BY importe_total
+    ORDER BY COUNT(*) DESC, importe_total
+    LIMIT 1;
+
+    SELECT mode_val AS moda, freq AS frecuencia;
+END`,
+
+  // Estadísticas de reservas por salón
+  `DROP PROCEDURE IF EXISTS sp_estadisticas_reservas_salon`,
+  `CREATE PROCEDURE sp_estadisticas_reservas_salon()
+BEGIN
+    DROP TEMPORARY TABLE IF EXISTS tmp_counts;
+    CREATE TEMPORARY TABLE tmp_counts AS
+        SELECT salon_id, COUNT(*) AS total_reservas
+        FROM reservas
+        WHERE activo = 1
+        GROUP BY salon_id;
+
+    DECLARE n INT;
+    DECLARE media_val DECIMAL(10,2);
+    DECLARE mediana_val DECIMAL(10,2);
+    DECLARE moda_val INT;
+    DECLARE salon_moda INT;
+
+    SELECT AVG(total_reservas) INTO media_val
+    FROM tmp_counts;
+
+    SELECT COUNT(*) INTO n
+    FROM tmp_counts;
+
+    IF n = 0 THEN
+        SET mediana_val = NULL;
+    ELSEIF MOD(n, 2) = 1 THEN
+        SELECT total_reservas INTO mediana_val
+        FROM tmp_counts
+        ORDER BY total_reservas
+        LIMIT FLOOR(n / 2), 1;
+    ELSE
+        SELECT AVG(val) INTO mediana_val
+        FROM (
+            SELECT total_reservas AS val
+            FROM tmp_counts
+            ORDER BY total_reservas
+            LIMIT n / 2 - 1, 2
+        ) AS tmp;
+    END IF;
+
+    SELECT total_reservas, salon_id
+    INTO moda_val, salon_moda
+    FROM tmp_counts
+    ORDER BY total_reservas DESC, salon_id
+    LIMIT 1;
+
+    DROP TEMPORARY TABLE IF EXISTS tmp_counts;
+
+    SELECT media_val AS media,
+           mediana_val AS mediana,
+           moda_val AS moda,
+           salon_moda AS salon_id;
+END`
+];
+
+DB_connection.query(crearDB, function (err, results) {
 DB_connection.query(crearDB, function (err) {
   if (err) {
     console.error('Error creando la base de datos: ', err);
@@ -205,26 +330,50 @@ DB_connection.query(crearDB, function (err) {
   }
   console.log('Base de datos creada o ya existente.');
 
-  DB_connection.query(usarDB, function (err) {
+  DB_connection.query("USE sgrcc_db;", function (err, results) {
     if (err) {
       console.error('Error al seleccionar la base de datos: ', err);
       return;
     }
 
     for (const tablaQuery of crearTablas) {
-      DB_connection.query(tablaQuery, function (err) {
-        if (err) { console.error('Error creando tablas:', err); return; }
+      DB_connection.query(tablaQuery, function (err, results) {
+        if (err) {
+          console.error('Error creando las tablas: ', err);
+          return;
+        }
         console.log('Tabla creada correctamente.');
       });
     }
 
     for (const insertQuery of insertarDatos) {
-      DB_connection.query(insertQuery, function (err) {
-        if (err) { console.error('Error insertando datos:', err); return; }
+      DB_connection.query(insertQuery, function (err, results) {
+        if (err) {
+          console.error('Error insertando datos: ', err);
+          return;
+        }
         console.log('Datos insertados correctamente.');
       });
     }
 
+    for (const insertQuery of alterTables) {
+      DB_connection.query(insertQuery, function (err, results) {
+        if (err) {
+          console.error('Error insertar ALTER: ', err);
+          return;
+        }
+        console.log('Claves Foraneas EXITOOOOO.');
+      });
+    }
+
+    // Crear procedimientos almacenados
+    for (const procQuery of crearProcedimientos) {
+      DB_connection.query(procQuery, function (err, results) {
+        if (err) {
+          console.error('Error creando procedimientos almacenados: ', err);
+          return;
+        }
+        console.log('Procedimiento almacenado ejecutado correctamente.');
     for (const alterQuery of alterTables) {
       DB_connection.query(alterQuery, function (err) {
         if (err) { console.error('Error en ALTER:', err); return; }
@@ -233,7 +382,10 @@ DB_connection.query(crearDB, function (err) {
     }
 
     DB_connection.end(function (err) {
-      if (err) { console.error('Error al cerrar conexión: ', err); return; }
+      if (err) {
+        console.error('Error al cerrar la conexión: ', err);
+        return;
+      }
       console.log('Conexión cerrada correctamente.');
     });
   });
