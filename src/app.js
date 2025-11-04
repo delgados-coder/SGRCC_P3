@@ -37,6 +37,12 @@ app.use('/api/servicios', require('./routes/servicios.routes.js'));
 app.use('/api/turnos', require('./routes/turnos.routes.js'));
 app.use('/api/reservas', require('./routes/reservas.routes.js'));
 
+// ----------------------
+// Documentación Swagger
+// ----------------------
+const setupSwagger = require('./docs/swagger');
+setupSwagger(app);
+
 // Ruta no encontrada (404)
 app.use(notFoundMiddleware.error_notFound);
 
