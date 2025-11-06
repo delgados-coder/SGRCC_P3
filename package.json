@@ -1,0 +1,33 @@
+{
+  "name": "sgrcc_prog3",
+  "version": "1.0.0",
+  "description": "Sistema de Gestión de Reservas de Casas de Cumpleaños - UNER FCAD - PROGRAMACION 3",
+  "main": "./src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "db": "node crearDB.js",
+    "client": "node z_ClienteFicticioDePrueba/cliente.js",
+    "client:validator": "node z_ClienteFicticioDePrueba/cliente_validator.js"
+  },
+  "keywords": [],
+  "author": "Moyano, Laura - Nieto, Ileana - Jerez, Pablo Agustin - Delgado, Santiago G.",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-validator": "^7.2.1",
+    "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.1",
+    "mysql2": "^3.14.3",
+    "pdfkit": "^0.17.2",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
+  }
+}
