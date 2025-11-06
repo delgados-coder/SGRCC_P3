@@ -12,7 +12,7 @@ const authController = require('../controllers/auth.controller.js');
 
 /**
  * @swagger
- * /api/auth/login:
+ * /auth/login:
  *   post:
  *     summary: Inicia sesión y obtiene un token JWT
  *     tags: [Autenticación]
@@ -28,7 +28,7 @@ const authController = require('../controllers/auth.controller.js');
  *             properties:
  *               nombre_usuario:
  *                 type: string
- *                 example: juan123
+ *                 example: juan123@gmail.com
  *               contrasenia:
  *                 type: string
  *                 example: 123456
@@ -48,7 +48,7 @@ const authController = require('../controllers/auth.controller.js');
 
 /**
  * @swagger
- * /api/auth/register:
+ * /auth/register:
  *   post:
  *     summary: Registra un nuevo usuario
  *     tags: [Autenticación]
@@ -73,7 +73,7 @@ const authController = require('../controllers/auth.controller.js');
  *                 example: Pérez
  *               nombre_usuario:
  *                 type: string
- *                 example: juan123
+ *                 example: juan123@gmail.com
  *               contrasenia:
  *                 type: string
  *                 example: 123456
