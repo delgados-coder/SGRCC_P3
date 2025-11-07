@@ -7,12 +7,14 @@
 */
 
 const PDFDocument = require('pdfkit');
+const env = require('../config/env.config.js');
 const usuariosModel = require('../models/usuarios.model.js');
 const turnosModel = require('../models/turnos.model.js');
 const salonesModel = require('../models/salones.model.js');
 const serviciosModel = require('../models/servicios.model.js');
 const reservasModel = require('../models/reservas.model.js');
 const { haySolapeTurnos } = require('../utils/overlapEngine.js');
+const { sendEmail } = require('../utils/emailService.js');
 
 //--------------------------------------------------------------------------------------------------------------------------------------//
 const c_Browse = async (req, res) => {
@@ -33,7 +35,6 @@ const c_Browse = async (req, res) => {
 };
 //--------------------------------------------------------------------------------------------------------------------------------------//
 
-// Detalle combinado por ID (JOIN a salones, turnos y usuarios) para auditoría del corrector.
 const c_BrowseJoin = async (req, res) => {
   try {
     console.log('c_BrowseJoin: obteniendo reserva con JOIN por ID');
@@ -87,7 +88,7 @@ const c_Read = async (req, res) => {
 };
 
 //--------------------------------------------------------------------------------------------------------------------------------------//
-// Alta con validación de solapamientos por salón + fecha + (hora_desde/hora_hasta del turno)
+
 const c_Add = async (req, res) => {
   console.log('Ejecutando método: add');
 
@@ -103,12 +104,11 @@ const c_Add = async (req, res) => {
       importe_total = null
     } = req.body;
 
-    // Validación mínima de integridad (el detalle fino se documenta en las rutas con express-validator)
     if (!usuario_id || !salon_id || !turno_id || !fecha_reserva) {
       return res.status(400).json({ message: 'Faltan datos obligatorios (usuario_id, salon_id, turno_id, fecha_reserva).' });
     }
 
-    // Turno elegido
+    // 🔹 Validar turno
     const turnoSel = await turnosModel.m_SELECT('*', { 'turno_id': turno_id });
     if (!turnoSel || turnoSel.length === 0) {
       return res.status(400).json({ message: 'Turno inexistente.' });
@@ -118,7 +118,7 @@ const c_Add = async (req, res) => {
       hora_hasta: turnoSel[0].hora_hasta
     };
 
-    // Turnos ya reservados ese día en ese salón (JOIN para obtener horas)
+    // 🔹 Validar solapamiento
     const columnasSolape = `
       reservas.reserva_id,
       t.hora_desde,
@@ -146,7 +146,7 @@ const c_Add = async (req, res) => {
       });
     }
 
-    // Inserción
+    
     const nueva = {
       usuario_id,
       salon_id,
@@ -160,12 +160,60 @@ const c_Add = async (req, res) => {
     };
 
     const result = await reservasModel.m_INSERT(nueva);
+
+    // datos obtenidos del cliente y edl salon
+    const [usuario] = await usuariosModel.m_SELECT('*', { usuario_id });
+    const [salon] = await salonesModel.m_SELECT('*', { salon_id });
+
+    if (usuario && salon) {
+      const clienteEmail = usuario.nombre_usuario;
+      const clienteNombre = `${usuario.nombre} ${usuario.apellido}`;
+      const adminEmail = env.ADMIN_EMAIL ;
+
+      console.log("----------------------------------------------------------------------------")
+      console.log(clienteEmail)
+      console.log(adminEmail)
+      console.log("----------------------------------------------------------------------------")
+
+
+      // notifniocacion para el admin
+      const htmlCliente = `
+        <h2>¡Reserva confirmada! 🎉</h2>
+        <p>Hola ${clienteNombre}, tu reserva ha sido confirmada.</p>
+        <ul>
+          <li><b>Salón:</b> ${salon.titulo}</li>
+          <li><b>Fecha:</b> ${fecha_reserva}</li>
+          <li><b>Turno:</b> ${turnoNuevo.hora_desde} - ${turnoNuevo.hora_hasta}</li>
+          <li><b>Temática:</b> ${tematica || 'Sin especificar'}</li>
+        </ul>
+        <p>Gracias por elegirnos 💕</p>
+      `;
+
+      // mensaje para elk cliente
+      const htmlAdmin = `
+        <h2>Nueva reserva creada</h2>
+        <p>El cliente <b>${clienteNombre}</b> ha realizado una reserva.</p>
+        <ul>
+          <li><b>Salón:</b> ${salon.titulo}</li>
+          <li><b>Fecha:</b> ${fecha_reserva}</li>
+          <li><b>Turno:</b> ${turnoNuevo.hora_desde} - ${turnoNuevo.hora_hasta}</li>
+          <li><b>Temática:</b> ${tematica || 'Sin especificar'}</li>
+        </ul>
+      `;
+
+      
+      sendEmail(clienteEmail, 'Tu reserva fue confirmada', htmlCliente);
+      sendEmail(adminEmail, 'Nueva reserva creada', htmlAdmin);
+    }
+
     res.status(201).json({ message: 'Reserva creada con éxito', reservaId: result.insertId });
+
   } catch (error) {
     console.error('Error al crear reserva:', error);
     res.status(500).json({ message: 'Hubo un error al crear la reserva' });
   }
 };
+
 
 //--------------------------------------------------------------------------------------------------------------------------------------//
 // Edición con revalidación de solapamientos si cambian salón, fecha o turno
