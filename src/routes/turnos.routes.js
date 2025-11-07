@@ -60,7 +60,7 @@ const hora = (campo) => check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), turnosController.c_Browse); 
+router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), turnosController.c_Browse);
 
 
 /**
@@ -110,7 +110,7 @@ router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), turn
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/:id_turno', authRoleMiddleware(['cliente','empleado','administrador']), turnosController.c_Read); 
+router.get('/:id_turno', authRoleMiddleware(['cliente', 'empleado', 'administrador']), turnosController.c_Read);
 
 
 /**
@@ -150,7 +150,7 @@ router.get('/:id_turno', authRoleMiddleware(['cliente','empleado','administrador
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', authRoleMiddleware(['empleado','administrador']), turnosController.c_Add); 
+router.post('/', authRoleMiddleware(['empleado', 'administrador']), turnosController.c_Add);
 
 /**
  * @swagger
@@ -192,7 +192,7 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), turnosControl
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id_turno', authRoleMiddleware(['empleado','administrador']), turnosController.c_Edit); 
+router.put('/:id_turno', authRoleMiddleware(['empleado', 'administrador']), turnosController.c_Edit);
 
 /**
  * @swagger
@@ -215,7 +215,7 @@ router.put('/:id_turno', authRoleMiddleware(['empleado','administrador']), turno
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id_turno', authRoleMiddleware(['empleado','administrador']), turnosController.c_Delete); 
+router.delete('/:id_turno', authRoleMiddleware(['empleado', 'administrador']), turnosController.c_Delete);
 router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), turnosController.c_Browse);
 
 router.get('/:id_turno',

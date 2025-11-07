@@ -28,7 +28,7 @@ const swaggerOptions = {
 
   // Ruta relativa que le indicará a Swagger qué archivos deberá buscar y dónde
   // Cada endpoint se documenta directamente en las rutas
-  apis: ['./src/routes/*.js'],  
+  apis: ['./src/routes/*.js'],
 };
 
 // ------ Generación de la especificación (swaggerSpec) ------

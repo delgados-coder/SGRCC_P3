@@ -1,5 +1,5 @@
 const serviciosModel = require('../models/servicios.model.js');
- 
+
 const c_Browse = (req, res) => {
   console.log('Ejecutando método: readAll');
   res.send('Obteniendo todos los registros de servicios');
