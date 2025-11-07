@@ -259,6 +259,31 @@ const c_Delete = async (req, res) => {
 };
 //--------------------------------------------------------------------------------------------------------------------------------------//
 
+const c_SoftDelete = async (req, res) => {
+  console.log('Ejecutando método: softDelete');
+
+  const { id_reserva, activo } = req.params;
+
+  try {
+    if (!['0', '1'].includes(activo)) {
+      return res.status(400).json({ message: 'El valor de "activo" debe ser 0 o 1' });
+    }
+
+    const result = await reservasModel.m_UPDATE({ activo: Number(activo) }, { reserva_id: id_reserva });
+
+    if (result && result.affectedRows > 0) {
+      const estado = activo === '1' ? 'activada' : 'desactivada';
+      res.status(200).json({ message: `Reserva con ID ${id_reserva} ${estado} correctamente` });
+    } else {
+      res.status(404).json({ message: `Reserva con ID ${id_reserva} no encontrada` });
+    }
+  } catch (error) {
+    console.error('Error en soft delete de reserva:', error);
+    res.status(500).json({ message: 'Hubo un error al cambiar el estado de la reserva' });
+  }
+};
+
+
 
 const c_GeneratePDF = async (req, res) => {
   console.log('Ejecutando método: c_GeneratePDF');
@@ -352,4 +377,4 @@ const c_GeneratePDF = async (req, res) => {
   }
 };
 
-module.exports = { c_Browse, c_BrowseJoin, c_Read, c_Add, c_Edit, c_Delete, c_GeneratePDF };
+module.exports = { c_Browse, c_BrowseJoin, c_Read, c_Add, c_Edit, c_Delete, c_SoftDelete, c_GeneratePDF };

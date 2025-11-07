@@ -237,6 +237,49 @@ router.delete(
   reservasController.c_Delete
 );
 
+
+/**
+ * @swagger
+ * /api/reservas/{id_reserva}/{activo}:
+ *   patch:
+ *     summary: Activa o desactiva una reserva (Soft Delete)
+ *     tags: [Reservas]
+ *     parameters:
+ *       - in: path
+ *         name: id_reserva
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID de la reserva a modificar
+ *       - in: path
+ *         name: activo
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [0, 1]
+ *         description: 1 para activar, 0 para desactivar
+ *     responses:
+ *       200:
+ *         description: Estado de la reserva actualizado correctamente
+ *       400:
+ *         description: Valor de 'activo' inválido
+ *       404:
+ *         description: Reserva no encontrada
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.patch(
+  '/:id_reserva/:activo',
+  authRoleMiddleware(['empleado', 'administrador']),
+  [
+    param('id_reserva').isInt({ min: 1 }).withMessage('ID de reserva inválido'),
+    param('activo').isIn(['0', '1']).withMessage('El valor de "activo" debe ser 0 o 1'),
+  ],
+  validation,
+  reservasController.c_SoftDelete
+);
+
+
 /**
  * @swagger
  * /api/reservas/pdf/{id_reserva}:
