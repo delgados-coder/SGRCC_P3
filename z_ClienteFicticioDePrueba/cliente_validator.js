@@ -109,12 +109,12 @@ async function main() {
   title('5) Intento de crear salón con rol "empleado" pero con DATOS INVALIDOS (DEBE dar 400 con errores de express-validator)');
   if (tokenEmpleado) {
     await post('/api/salones', {
-      titulo: '',
-      direccion: '   ',
-      capacidad: -5,
-      importe: -10,
-      latitud: 'ochenta',
-      longitud: 'ciento veinte',
+       titulo: '',                   // vacío -> notEmpty
+      direccion: '   ',             // solo espacios -> notEmpty + trim
+      capacidad: -5,                // inválido -> min:1
+      importe: -10,                 // inválido -> min:0
+      latitud: 'ochenta',           // inválido -> float
+      longitud: 'ciento veinte',    // inválido -> float
     }, authEmpleado);
   }
 
@@ -125,8 +125,8 @@ async function main() {
       direccion: 'Av. Siempreviva 742',
       capacidad: 120,
       importe: 250000,
-      latitud: -31.4167,
-      longitud: -64.1833,
+      latitud: -31.4167,    // opcional
+      longitud: -64.1833,   // opcional
     }, authEmpleado);
   }
 
