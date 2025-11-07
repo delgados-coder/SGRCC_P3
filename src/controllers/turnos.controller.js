@@ -5,7 +5,13 @@ const c_Browse = async (req, res) => {
   try {
     console.log('Ejecutando método: c_BROWSE (todos los registros de turnos)');
 
-    const turnos = await turnosModel.m_SELECT('*');
+    // Permite filtrar solo activos si se pasa query ?activo=1 o ?activo=0
+    const filtros = {};
+    if (req.query.activo !== undefined) {
+      filtros.activo = req.query.activo == '1' ? 1 : 0;
+    }
+
+    const turnos = await turnosModel.m_SELECT('*', filtros, 'orden ASC');
 
     if (turnos.length > 0) {
       res.status(200).json(turnos);
@@ -21,11 +27,10 @@ const c_Browse = async (req, res) => {
 
 const c_Read = async (req, res) => {
   console.log('Ejecutando método: c_READ (Un turno por ID)');
-
   const { turno_id } = req.params;
 
   try {
-    const turno = await turnosModel.m_SELECT('*', { 'turno_id': turno_id });
+    const turno = await turnosModel.m_SELECT('*', { turno_id });
 
     if (turno && turno.length > 0) {
       res.status(200).json(turno[0]);
@@ -39,9 +44,8 @@ const c_Read = async (req, res) => {
 };
 //--------------------------------------------------------------------------------------------------------------------------------------//
 
-const c_Add = (req, res) => {
+const c_Add = async (req, res) => {
   console.log('Ejecutando método: ADD (AÑADIR UN NUEVO TURNO)');
-
   const { orden, hora_desde, hora_hasta, activo } = req.body;
 
   if (orden === undefined || !hora_desde || !hora_hasta) {
@@ -54,23 +58,24 @@ const c_Add = (req, res) => {
     orden,
     hora_desde,
     hora_hasta,
-    activo: activo !== undefined ? activo : 1,
+    activo: activo == 0 ? 0 : 1, // si no se envía, se asume activo (1)
   };
 
-  turnosModel.m_INSERT(nuevoTurno)
-    .then((result) => {
-      res.status(201).json({ message: 'Turno creado con éxito', turnoId: result.insertId });
-    })
-    .catch((error) => {
-      console.error('Error al insertar turno:', error);
-      res.status(500).json({ message: 'Hubo un error al crear el turno' });
+  try {
+    const result = await turnosModel.m_INSERT(nuevoTurno);
+    res.status(201).json({
+      message: 'Turno creado con éxito',
+      turnoId: result.insertId,
     });
+  } catch (error) {
+    console.error('Error al insertar turno:', error);
+    res.status(500).json({ message: 'Hubo un error al crear el turno' });
+  }
 };
 //--------------------------------------------------------------------------------------------------------------------------------------//
 
 const c_Edit = async (req, res) => {
   console.log('Ejecutando método: c_EDIT (Actualizar turno)');
-
   const { turno_id } = req.params;
   const turnoData = req.body;
 
@@ -80,8 +85,12 @@ const c_Edit = async (req, res) => {
     });
   }
 
+  if (turnoData.activo !== undefined) {
+    turnoData.activo = turnoData.activo == 1 ? 1 : 0;
+  }
+
   try {
-    const resultado = await turnosModel.m_UPDATE(turnoData, { 'turno_id': turno_id });
+    const resultado = await turnosModel.m_UPDATE(turnoData, { turno_id });
 
     if (resultado && resultado.affectedRows > 0) {
       res.status(200).json({ message: `Turno con ID ${turno_id} actualizado con éxito` });
@@ -97,11 +106,10 @@ const c_Edit = async (req, res) => {
 
 const c_Delete = async (req, res) => {
   console.log('Ejecutando método: c_DELETE (Eliminar turno)');
-
   const { turno_id } = req.params;
 
   try {
-    const result = await turnosModel.m_DELETE({ 'turno_id': turno_id });
+    const result = await turnosModel.m_DELETE({ turno_id });
 
     if (result && result.affectedRows > 0) {
       res.status(200).json({ message: `Turno con ID ${turno_id} eliminado con éxito` });
@@ -116,24 +124,23 @@ const c_Delete = async (req, res) => {
 //--------------------------------------------------------------------------------------------------------------------------------------//
 
 const c_SoftDelete = async (req, res) => {
-  console.log('Ejecutando método: SOFTDELETE (Desactivar o activar un turno)');
-
+  console.log('Ejecutando método: SOFTDELETE (Activar/Desactivar turno)');
   const { turno_id, activo } = req.params;
 
-  if (activo !== "activado" && activo !== "desactivado") {
-    return res.status(400).json({ message: 'Estado no válido. Debe ser "activado" o "desactivado".' });
+  if (activo !== '1' && activo !== '0') {
+    return res.status(400).json({ message: 'El valor de "activo" debe ser 1 o 0.' });
   }
 
-  const nuevoEstado = (activo === "activado") ? 1 : 0;
+  const nuevoEstado = parseInt(activo, 10);
 
   try {
-    const turno = await turnosModel.m_SELECT('*', { 'turno_id': turno_id });
+    const turno = await turnosModel.m_SELECT('*', { turno_id });
 
     if (!turno || turno.length === 0) {
       return res.status(404).json({ message: `Turno con ID ${turno_id} no encontrado` });
     }
 
-    const resultado = await turnosModel.m_UPDATE({ activo: nuevoEstado }, { 'turno_id': turno_id });
+    const resultado = await turnosModel.m_UPDATE({ activo: nuevoEstado }, { turno_id });
 
     if (resultado && resultado.affectedRows > 0) {
       res.status(200).json({
@@ -148,7 +155,8 @@ const c_SoftDelete = async (req, res) => {
     res.status(500).json({ message: 'Hubo un error al intentar ejecutar el soft delete del turno' });
   }
 };
-
 //--------------------------------------------------------------------------------------------------------------------------------------//
 
 module.exports = { c_Browse, c_Read, c_Add, c_Edit, c_Delete, c_SoftDelete };
+
+
