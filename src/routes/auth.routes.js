@@ -44,7 +44,6 @@ const authController = require('../controllers/auth.controller.js');
  *       500:
  *         description: Error en el servidor.
  */
-// rutas definidas más abajo con validaciones
 
 /**
  * @swagger
@@ -96,35 +95,71 @@ const authController = require('../controllers/auth.controller.js');
  *       500:
  *         description: Error interno del servidor.
  */
-// rutas definidas más abajo con validaciones
 
 /**
  * @swagger
- * /api/auth/logout:
+ * /auth/logout:
  *   post:
- *     summary: Cierra la sesión actual del usuario
+ *     summary: Cierra la sesión actual del usuario invalidando el token de refresco
  *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: Escribe aqui tu REFRESH TOKEN
  *     responses:
  *       200:
  *         description: Sesión cerrada correctamente.
+ *       400:
+ *         description: No se proporcionó el token de refresco.
+ *       500:
+ *         description: Error interno del servidor.
  */
-// ruta definida más abajo
 
 /**
  * @swagger
- * /api/auth/refresh:
- *   get:
+ * /auth/refresh:
+ *   post:
  *     summary: Obtiene un nuevo token JWT usando un token de refresco
  *     tags: [Autenticación]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 description: Token de refresco JWT válido
+ *                 example: Escribe aqui tu REFRESH TOKEN
  *     responses:
  *       200:
  *         description: Token de acceso renovado correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   description: Nuevo token de acceso JWT
  *       401:
  *         description: Token de refresco inválido o expirado.
  *       500:
  *         description: Error en el servidor.
  */
-// ruta definida más abajo
+
+
 const router = express.Router();
 
 router.post(
@@ -153,6 +188,7 @@ router.post(
 );
 
 router.post('/logout', authController.logout);
-router.get('/refresh', authController.refresh);
+router.post('/refresh', authController.refresh);
+
 
 module.exports = router;
