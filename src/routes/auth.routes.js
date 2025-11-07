@@ -28,7 +28,7 @@ const authController = require('../controllers/auth.controller.js');
  *             properties:
  *               nombre_usuario:
  *                 type: string
- *                 example: juan123@gmail.com
+ *                 example: testing@gmail.com
  *               contrasenia:
  *                 type: string
  *                 example: 123456
@@ -72,13 +72,13 @@ const authController = require('../controllers/auth.controller.js');
  *                 example: Pérez
  *               nombre_usuario:
  *                 type: string
- *                 example: juan123@gmail.com
+ *                 example: testing@gmail.com
  *               contrasenia:
  *                 type: string
  *                 example: 123456
  *               tipo_usuario:
  *                 type: string
- *                 enum: [cliente, empleado, administrador]
+ *                 enum: [administrador, empleado, cliente ]
  *               celular:
  *                 type: string
  *                 example: "1123456789"

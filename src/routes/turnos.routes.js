@@ -15,7 +15,7 @@ const hora = (campo) => check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(
  * @swagger
  * tags:
  *   name: Turnos
- *   description: Operaciones de gestión de turnos para reservas
+ *   description: Operaciones de gestión de turnos
  */
 
 /**
@@ -27,6 +27,34 @@ const hora = (campo) => check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(
  *     responses:
  *       200:
  *         description: Lista de turnos obtenida correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   turno_id:
+ *                     type: integer
+ *                     example: 1
+ *                   orden:
+ *                     type: integer
+ *                     example: 1
+ *                   hora_desde:
+ *                     type: string
+ *                     example: "12:00:00"
+ *                   hora_hasta:
+ *                     type: string
+ *                     example: "14:00:00"
+ *                   activo:
+ *                     type: integer
+ *                     example: 1
+ *                   creado:
+ *                     type: string
+ *                     example: "2025-08-19 21:44:19"
+ *                   modificado:
+ *                     type: string
+ *                     example: "2025-08-19 21:44:19"
  *       404:
  *         description: No se encontraron turnos
  *       500:
@@ -37,13 +65,13 @@ router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), turn
 
 /**
  * @swagger
- * /api/turnos/{id_turno}:
+ * /api/turnos/{turno_id}:
  *   get:
  *     summary: Obtiene un turno por su ID
  *     tags: [Turnos]
  *     parameters:
  *       - in: path
- *         name: id_turno
+ *         name: turno_id
  *         required: true
  *         schema:
  *           type: integer
@@ -51,6 +79,32 @@ router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), turn
  *     responses:
  *       200:
  *         description: Turno encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 turno_id:
+ *                   type: integer
+ *                   example: 1
+ *                 orden:
+ *                   type: integer
+ *                   example: 1
+ *                 hora_desde:
+ *                   type: string
+ *                   example: "12:00:00"
+ *                 hora_hasta:
+ *                   type: string
+ *                   example: "14:00:00"
+ *                 activo:
+ *                   type: integer
+ *                   example: 1
+ *                 creado:
+ *                   type: string
+ *                   example: "2025-08-19 21:44:19"
+ *                 modificado:
+ *                   type: string
+ *                   example: "2025-08-19 21:44:19"
  *       404:
  *         description: Turno no encontrado
  *       500:
@@ -71,16 +125,23 @@ router.get('/:id_turno', authRoleMiddleware(['cliente','empleado','administrador
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - orden
+ *               - hora_desde
+ *               - hora_hasta
  *             properties:
+ *               orden:
+ *                 type: integer
+ *                 example: 1
  *               hora_desde:
  *                 type: string
- *                 example: "10:00"
+ *                 example: "12:00:00"
  *               hora_hasta:
  *                 type: string
- *                 example: "14:00"
- *               descripcion:
- *                 type: string
- *                 example: "Turno matutino para eventos infantiles"
+ *                 example: "14:00:00"
+ *               activo:
+ *                 type: integer
+ *                 example: 1
  *     responses:
  *       201:
  *         description: Turno creado correctamente
@@ -93,13 +154,13 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), turnosControl
 
 /**
  * @swagger
- * /api/turnos/{id_turno}:
+ * /api/turnos/{turno_id}:
  *   put:
  *     summary: Actualiza un turno existente
  *     tags: [Turnos]
  *     parameters:
  *       - in: path
- *         name: id_turno
+ *         name: turno_id
  *         required: true
  *         schema:
  *           type: integer
@@ -111,15 +172,18 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), turnosControl
  *           schema:
  *             type: object
  *             properties:
+ *               orden:
+ *                 type: integer
+ *                 example: 2
  *               hora_desde:
  *                 type: string
- *                 example: "15:00"
+ *                 example: "15:00:00"
  *               hora_hasta:
  *                 type: string
- *                 example: "19:00"
- *               descripcion:
- *                 type: string
- *                 example: "Turno vespertino actualizado"
+ *                 example: "17:00:00"
+ *               activo:
+ *                 type: integer
+ *                 example: 1
  *     responses:
  *       200:
  *         description: Turno actualizado correctamente
@@ -132,13 +196,13 @@ router.put('/:id_turno', authRoleMiddleware(['empleado','administrador']), turno
 
 /**
  * @swagger
- * /api/turnos/{id_turno}:
+ * /api/turnos/{turno_id}:
  *   delete:
  *     summary: Elimina un turno del sistema
  *     tags: [Turnos]
  *     parameters:
  *       - in: path
- *         name: id_turno
+ *         name: turno_id
  *         required: true
  *         schema:
  *           type: integer
