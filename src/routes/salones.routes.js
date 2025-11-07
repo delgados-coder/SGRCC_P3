@@ -29,7 +29,11 @@ const validation = require('../middlewares/validation.middleware.js');
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), salonesController.c_Browse); 
+router.get(
+    '/',
+    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+    salonesController.c_Browse
+);
 
 /**
  * @swagger
@@ -52,7 +56,13 @@ router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), salo
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/:id_salon', authRoleMiddleware(['cliente','empleado','administrador']), salonesController.c_Read); 
+router.get(
+    '/:id_salon',
+    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+    [param('id_salon').isInt({ min: 1 }).withMessage('ID de salon inválido')],
+    validation,
+    salonesController.c_Read
+);
 
 /**
  * @swagger
@@ -70,25 +80,31 @@ router.get('/:id_salon', authRoleMiddleware(['cliente','empleado','administrador
  *               titulo:
  *                 type: string
  *                 description: Nombre del salón
+ *               direccion:
+ *                 type: string
+ *                 description: Dirección del salón
  *               capacidad:
  *                 type: integer
  *                 description: Capacidad máxima de personas
- *               ubicacion:
- *                 type: string
- *                 description: Dirección o ubicación del salón
- *               descripcion:
- *                 type: string
- *                 description: Descripción del salón
- *               precio_base:
+ *               importe:
  *                 type: number
  *                 format: float
- *                 description: Precio base de reserva
+ *                 description: Importe base del salón
+ *               latitud:
+ *                 type: number
+ *                 format: float
+ *                 description: Latitud (opcional)
+ *               longitud:
+ *                 type: number
+ *                 format: float
+ *                 description: Longitud (opcional)
  *             example:
  *               titulo: "Salón Arcoiris"
+ *               direccion: "Av. Siempre Viva 123"
  *               capacidad: 50
- *               ubicacion: "Av. Siempre Viva 123"
- *               descripcion: "Salón ideal para cumpleaños infantiles"
- *               precio_base: 15000
+ *               importe: 150000
+ *               latitud: -31.4167
+ *               longitud: -64.1833
  *     responses:
  *       201:
  *         description: Salón creado correctamente
@@ -97,7 +113,20 @@ router.get('/:id_salon', authRoleMiddleware(['cliente','empleado','administrador
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', authRoleMiddleware(['empleado','administrador']), salonesController.c_Add); 
+router.post(
+    '/',
+    authRoleMiddleware(['empleado', 'administrador']),
+    [
+        check('titulo').trim().notEmpty().withMessage('El título es obligatorio'),
+        check('direccion').trim().notEmpty().withMessage('La dirección es obligatoria'),
+        check('capacidad').isInt({ min: 1 }).withMessage('La capacidad debe ser un entero >= 1'),
+        check('importe').isFloat({ gt: 0 }).withMessage('El importe debe ser > 0'),
+        check('latitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitud inválida'),
+        check('longitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitud inválida'),
+    ],
+    validation,
+    salonesController.c_Add
+);
 
 /**
  * @swagger
@@ -121,21 +150,26 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), salonesContro
  *             properties:
  *               titulo:
  *                 type: string
+ *               direccion:
+ *                 type: string
  *               capacidad:
  *                 type: integer
- *               ubicacion:
- *                 type: string
- *               descripcion:
- *                 type: string
- *               precio_base:
+ *               importe:
+ *                 type: number
+ *                 format: float
+ *               latitud:
+ *                 type: number
+ *                 format: float
+ *               longitud:
  *                 type: number
  *                 format: float
  *             example:
  *               titulo: "Trampolín Play"
+ *               direccion: "Belgrano 100"
  *               capacidad: 70
- *               ubicacion: "Belgrano 100"
- *               descripcion: "Salón remodelado con mejor iluminación"
- *               precio_base: 200000
+ *               importe: 200000
+ *               latitud: -31.42
+ *               longitud: -64.18
  *     responses:
  *       200:
  *         description: Salón actualizado correctamente
@@ -144,7 +178,21 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), salonesContro
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id_salon', authRoleMiddleware(['empleado','administrador']), salonesController.c_Edit); 
+router.put(
+    '/:id_salon',
+    authRoleMiddleware(['empleado', 'administrador']),
+    [
+        param('id_salon').isInt({ min: 1 }).withMessage('ID de salon inválido'),
+        check('titulo').optional().trim().notEmpty(),
+        check('direccion').optional().trim().notEmpty(),
+        check('capacidad').optional().isInt({ min: 1 }),
+        check('importe').optional().isFloat({ min: 0 }),
+        check('latitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -90, max: 90 }),
+        check('longitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -180, max: 180 }),
+    ],
+    validation,
+    salonesController.c_Edit
+);
 
 /**
  * @swagger
@@ -167,46 +215,8 @@ router.put('/:id_salon', authRoleMiddleware(['empleado','administrador']), salon
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id_salon', authRoleMiddleware(['empleado','administrador']), salonesController.c_Delete); 
-router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), salonesController.c_Browse);
-
-router.get('/:id_salon',
-    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_salon').isInt({ min: 1 }).withMessage('ID de salon inválido')],
-    validation,
-    salonesController.c_Read
-);
-
-router.post('/',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [
-        check('titulo').trim().notEmpty().withMessage('El título es obligatorio'),
-        check('direccion').trim().notEmpty().withMessage('La dirección es obligatoria'),
-        check('capacidad').isInt({ min: 1 }).withMessage('La capacidad debe ser un número entero positivo'),
-        check('importe').isFloat({ gt: 0 }).withMessage('El importe debe ser un número válido mayor a 0'),
-        check('latitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -90, max: 90 }).withMessage('Latitud inválida'),
-        check('longitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -180, max: 180 }).withMessage('Longitud inválida'),
-    ],
-    validation,
-    salonesController.c_Add
-);
-
-router.put('/:id_salon',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [
-        param('id_salon').isInt({ min: 1 }).withMessage('ID desalon inválido'),
-        check('titulo').optional().trim().notEmpty(),
-        check('direccion').optional().trim().notEmpty(),
-        check('capacidad').optional().isInt({ min: 1 }),
-        check('importe').optional().isFloat({ min: 0 }),
-        check('latitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -90, max: 90 }),
-        check('longitud').optional({ nullable: true, checkFalsy: true }).isFloat({ min: -180, max: 180 }),
-    ],
-    validation,
-    salonesController.c_Edit
-);
-
-router.delete('/:id_salon',
+router.delete(
+    '/:id_salon',
     authRoleMiddleware(['empleado', 'administrador']),
     [param('id_salon').isInt({ min: 1 }).withMessage('ID de salon inválido')],
     validation,

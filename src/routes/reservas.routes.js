@@ -10,7 +10,6 @@ const validation = require('../middlewares/validation.middleware.js');
 //-----------Rutas BREAD -----------
 // Browse, Read, Edit, Add, Delete
 
-
 /**
  * @swagger
  * tags:
@@ -32,7 +31,11 @@ const validation = require('../middlewares/validation.middleware.js');
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), reservasController.c_Browse);   
+router.get(
+  '/',
+  authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+  reservasController.c_Browse
+);
 
 /**
  * @swagger
@@ -48,7 +51,11 @@ router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), rese
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/join/:id_reserva', authRoleMiddleware(['cliente','empleado','administrador']), reservasController.c_BrowseJoin);           
+router.get(
+  '/join',
+  authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+  reservasController.c_BrowseJoin
+);
 
 /**
  * @swagger
@@ -71,7 +78,13 @@ router.get('/join/:id_reserva', authRoleMiddleware(['cliente','empleado','admini
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/:id_reserva', authRoleMiddleware(['cliente','empleado','administrador']), reservasController.c_Read);  
+router.get(
+  '/:id_reserva',
+  authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+  [param('id_reserva').isInt({ min: 1 }).withMessage('id_reserva inválido')],
+  validation,
+  reservasController.c_Read
+);
 
 /**
  * @swagger
@@ -99,6 +112,14 @@ router.get('/:id_reserva', authRoleMiddleware(['cliente','empleado','administrad
  *                 type: string
  *                 format: date
  *                 description: Fecha de la reserva
+ *               tematica:
+ *                 type: string
+ *               foto_cumpleaniero:
+ *                 type: string
+ *               importe_salon:
+ *                 type: number
+ *               importe_total:
+ *                 type: number
  *     responses:
  *       201:
  *         description: Reserva creada correctamente
@@ -107,7 +128,24 @@ router.get('/:id_reserva', authRoleMiddleware(['cliente','empleado','administrad
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', authRoleMiddleware(['cliente','administrador']), reservasController.c_Add);    
+router.post(
+  '/',
+  authRoleMiddleware(['cliente', 'administrador']),
+  [
+    check('fecha_reserva')
+      .isISO8601()
+      .withMessage('La fecha de reserva debe ser YYYY-MM-DD'),
+    check('salon_id').isInt({ min: 1 }).withMessage('ID de salón inválido'),
+    check('usuario_id').isInt({ min: 1 }).withMessage('ID de usuario inválido'),
+    check('turno_id').isInt({ min: 1 }).withMessage('ID de turno inválido'),
+    check('tematica').optional({ nullable: true, checkFalsy: true }).isLength({ max: 255 }),
+    check('foto_cumpleaniero').optional({ nullable: true, checkFalsy: true }).isString(),
+    check('importe_salon').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0 }),
+    check('importe_total').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0 }),
+  ],
+  validation,
+  reservasController.c_Add
+);
 
 /**
  * @swagger
@@ -136,6 +174,14 @@ router.post('/', authRoleMiddleware(['cliente','administrador']), reservasContro
  *               fecha_reserva:
  *                 type: string
  *                 format: date
+ *               tematica:
+ *                 type: string
+ *               foto_cumpleaniero:
+ *                 type: string
+ *               importe_salon:
+ *                 type: number
+ *               importe_total:
+ *                 type: number
  *     responses:
  *       200:
  *         description: Reserva actualizada correctamente
@@ -144,7 +190,23 @@ router.post('/', authRoleMiddleware(['cliente','administrador']), reservasContro
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id_reserva', authRoleMiddleware(['administrador']), reservasController.c_Edit);  
+router.put(
+  '/:id_reserva',
+  authRoleMiddleware(['administrador']),
+  [
+    param('id_reserva').isInt({ min: 1 }).withMessage('ID de reserva inválido'),
+    check('fecha_reserva').optional().isISO8601(),
+    check('salon_id').optional().isInt({ min: 1 }),
+    check('usuario_id').optional().isInt({ min: 1 }),
+    check('turno_id').optional().isInt({ min: 1 }),
+    check('tematica').optional().isLength({ max: 255 }),
+    check('foto_cumpleaniero').optional().isString(),
+    check('importe_salon').optional().isFloat({ min: 0 }),
+    check('importe_total').optional().isFloat({ min: 0 }),
+  ],
+  validation,
+  reservasController.c_Edit
+);
 
 /**
  * @swagger
@@ -167,7 +229,13 @@ router.put('/:id_reserva', authRoleMiddleware(['administrador']), reservasContro
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id_reserva', authRoleMiddleware(['administrador']), reservasController.c_Delete); 
+router.delete(
+  '/:id_reserva',
+  authRoleMiddleware(['administrador']),
+  [param('id_reserva').isInt({ min: 1 }).withMessage('ID de reserva inválido')],
+  validation,
+  reservasController.c_Delete
+);
 
 /**
  * @swagger
@@ -195,68 +263,12 @@ router.delete('/:id_reserva', authRoleMiddleware(['administrador']), reservasCon
  *       500:
  *         description: Error interno al generar el PDF
  */
-router.get('/pdf/:id_reserva', authRoleMiddleware(['cliente','empleado','administrador']), reservasController.c_GeneratePDF);
-router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), reservasController.c_Browse);
-
-router.get('/join/:id_reserva',
-    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_reserva').isInt({ min: 1 }).withMessage('id_reserva inválido')],
-    validation,
-    reservasController.c_BrowseJoin
-);
-
-router.get('/:id_reserva',
-    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_reserva').isInt({ min: 1 }).withMessage('id_reserva inválido')],
-    validation,
-    reservasController.c_Read
-);
-
-router.post('/',
-    authRoleMiddleware(['cliente', 'administrador']),
-    [
-        check('fecha_reserva').isISO8601().withMessage('La fecha de reserva debe ser YYYY-MM-DD'),
-        check('salon_id').isInt({ min: 1 }).withMessage('ID de salon inválido'),
-        check('usuario_id').isInt({ min: 1 }).withMessage('ID de usuario inválido'),
-        check('turno_id').isInt({ min: 1 }).withMessage('ID de turno inválido'),
-        check('tematica').optional({ nullable: true, checkFalsy: true }).isLength({ max: 255 }),
-        check('foto_cumpleaniero').optional({ nullable: true, checkFalsy: true }).isString(),
-        check('importe_salon').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0 }),
-        check('importe_total').optional({ nullable: true, checkFalsy: true }).isFloat({ min: 0 }),
-    ],
-    validation,
-    reservasController.c_Add
-);
-
-router.put('/:id_reserva',
-    authRoleMiddleware(['administrador']),
-    [
-        param('id_reserva').isInt({ min: 1 }).withMessage('ID dereserva inválido'),
-        check('fecha_reserva').optional().isISO8601(),
-        check('salon_id').optional().isInt({ min: 1 }),
-        check('usuario_id').optional().isInt({ min: 1 }),
-        check('turno_id').optional().isInt({ min: 1 }),
-        check('tematica').optional().isLength({ max: 255 }),
-        check('foto_cumpleaniero').optional().isString(),
-        check('importe_salon').optional().isFloat({ min: 0 }),
-        check('importe_total').optional().isFloat({ min: 0 }),
-    ],
-    validation,
-    reservasController.c_Edit
-);
-
-router.delete('/:id_reserva',
-    authRoleMiddleware(['administrador']),
-    [param('id_reserva').isInt({ min: 1 }).withMessage('ID de reserva inválido')],
-    validation,
-    reservasController.c_Delete
-);
-
-router.get('/pdf/:id_reserva',
-    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_reserva').isInt({ min: 1 }).withMessage('ID de reserva inválido')],
-    validation,
-    reservasController.c_GeneratePDF
+router.get(
+  '/pdf/:id_reserva',
+  authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+  [param('id_reserva').isInt({ min: 1 }).withMessage('ID de reserva inválido')],
+  validation,
+  reservasController.c_GeneratePDF
 );
 
 module.exports = router;

@@ -14,7 +14,7 @@ const authController = require('../controllers/auth.controller.js');
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Inicia sesión y obtiene un token JWT
+ *     summary: Inicia sesión y obtiene tokens JWT
  *     tags: [Autenticación]
  *     requestBody:
  *       required: true
@@ -34,7 +34,18 @@ const authController = require('../controllers/auth.controller.js');
  *                 example: 123456
  *     responses:
  *       200:
- *         description: Autenticación exitosa. Devuelve un token JWT.
+ *         description: Autenticación exitosa. Devuelve tokens JWT.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 accessToken:
+ *                   type: string
+ *                 refreshToken:
+ *                   type: string
  *       400:
  *         description: Faltan datos obligatorios.
  *       401:
@@ -150,45 +161,58 @@ const authController = require('../controllers/auth.controller.js');
  *             schema:
  *               type: object
  *               properties:
+ *                 message:
+ *                   type: string
  *                 accessToken:
  *                   type: string
  *                   description: Nuevo token de acceso JWT
  *       401:
- *         description: Token de refresco inválido o expirado.
+ *         description: Token de refresco no proporcionado.
+ *       403:
+ *         description: Refresh token inválido o expirado.
  *       500:
  *         description: Error en el servidor.
  */
 
-
 const router = express.Router();
 
 router.post(
-    '/login',
-    [
-        check('nombre_usuario').isEmail().withMessage('Debe ser un email válido'),
-        check('contrasenia').notEmpty().withMessage('La contraseña es requerida'),
-    ],
-    validation,
-    authController.login
+  '/login',
+  [
+    check('nombre_usuario').isEmail().withMessage('Debe ser un email válido'),
+    check('contrasenia').notEmpty().withMessage('La contraseña es requerida'),
+  ],
+  validation,
+  authController.login
 );
 
 router.post(
-    '/register',
-    [
-        check('nombre').trim().notEmpty().withMessage('El nombre es requerido'),
-        check('apellido').trim().notEmpty().withMessage('El apellido es requerido'),
-        check('nombre_usuario').isEmail().withMessage('Debe ser un email válido'),
-        check('contrasenia').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
-        check('tipo_usuario').isIn(['cliente', 'empleado', 'administrador']).withMessage('Tipo de usuario inválido'),
-        check('celular').optional({ nullable: true, checkFalsy: true }).isString(),
-        check('foto').optional({ nullable: true, checkFalsy: true }).isString(),
-    ],
-    validation,
-    authController.register
+  '/register',
+  [
+    check('nombre').trim().notEmpty().withMessage('El nombre es requerido'),
+    check('apellido').trim().notEmpty().withMessage('El apellido es requerido'),
+    check('nombre_usuario').isEmail().withMessage('Debe ser un email válido'),
+    check('contrasenia').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+    check('tipo_usuario').isIn(['cliente', 'empleado', 'administrador']).withMessage('Tipo de usuario inválido'),
+    check('celular').optional({ nullable: true, checkFalsy: true }).isString(),
+    check('foto').optional({ nullable: true, checkFalsy: true }).isString(),
+  ],
+  validation,
+  authController.register
 );
 
-router.post('/logout', authController.logout);
-router.post('/refresh', authController.refresh);
+router.post(
+  '/logout',
+  [check('refreshToken').notEmpty().withMessage('refreshToken es requerido')],
+  validation,
+  authController.logout
+);
 
+router.post(
+  '/refresh',
+  [check('refreshToken').notEmpty().withMessage('refreshToken es requerido')],
+  validation,
+  authController.refresh
+);
 
 module.exports = router;

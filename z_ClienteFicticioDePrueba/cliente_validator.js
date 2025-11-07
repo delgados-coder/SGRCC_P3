@@ -2,9 +2,9 @@
 // Ejecutar con: `npm run client:validator`
 
 const axios = require('axios');
-const { CLIENT_BASE_URL } = require('../src/config/env.config.js');
+const env = require('../src/config/env.config.js');
 
-const BASE_URL = CLIENT_BASE_URL;
+const BASE_URL = (env && env.CLIENT_BASE_URL) || `http://localhost:${env?.PORT || 3000}`;
 
 const title = (t) => {
   console.log('\n' + '='.repeat(86));
@@ -32,7 +32,8 @@ async function login(body) {
   try {
     const { data, status } = await axios.post(`${BASE_URL}/auth/login`, body);
     show(`✅ /auth/login (${status})`, data);
-    return data.token;
+    // El backend devuelve { accessToken, refreshToken }
+    return data.accessToken;
   } catch (err) {
     if (err.response) show(`❌ /auth/login (${err.response.status})`, err.response.data);
     else console.error(err.message);
@@ -108,12 +109,12 @@ async function main() {
   title('5) Intento de crear salón con rol "empleado" pero con DATOS INVALIDOS (DEBE dar 400 con errores de express-validator)');
   if (tokenEmpleado) {
     await post('/api/salones', {
-      titulo: '',                   // vacío -> notEmpty
-      direccion: '   ',             // solo espacios -> notEmpty + trim
-      capacidad: -5,                // inválido -> min:1
-      importe: -10,                 // inválido -> min:0
-      latitud: 'ochenta',           // inválido -> float
-      longitud: 'ciento veinte',    // inválido -> float
+      titulo: '',
+      direccion: '   ',
+      capacidad: -5,
+      importe: -10,
+      latitud: 'ochenta',
+      longitud: 'ciento veinte',
     }, authEmpleado);
   }
 
@@ -124,8 +125,8 @@ async function main() {
       direccion: 'Av. Siempreviva 742',
       capacidad: 120,
       importe: 250000,
-      latitud: -31.4167,    // opcional
-      longitud: -64.1833,   // opcional
+      latitud: -31.4167,
+      longitud: -64.1833,
     }, authEmpleado);
   }
 
