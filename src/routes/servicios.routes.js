@@ -37,13 +37,13 @@ router.get(
 
 /**
  * @swagger
- * /api/servicios/{id_servicio}:
+ * /api/servicios/{servicio_id}:
  *   get:
  *     summary: Obtiene un servicio por su ID
  *     tags: [Servicios]
  *     parameters:
  *       - in: path
- *         name: id_servicio
+ *         name: servicio_id
  *         required: true
  *         schema:
  *           type: integer
@@ -57,9 +57,9 @@ router.get(
  *         description: Error interno del servidor
  */
 router.get(
-    '/:id_servicio',
+    '/:servicio_id',
     authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
+    [param('servicio_id').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
     validation,
     serviciosController.c_Read
 );
@@ -114,13 +114,13 @@ router.post(
 
 /**
  * @swagger
- * /api/servicios/{id_servicio}:
+ * /api/servicios/{servicio_id}:
  *   put:
  *     summary: Actualiza un servicio existente
  *     tags: [Servicios]
  *     parameters:
  *       - in: path
- *         name: id_servicio
+ *         name: servicio_id
  *         required: true
  *         schema:
  *           type: integer
@@ -153,10 +153,10 @@ router.post(
  *         description: Error interno del servidor
  */
 router.put(
-    '/:id_servicio',
+    '/:servicio_id',
     authRoleMiddleware(['empleado', 'administrador']),
     [
-        param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido'),
+        param('servicio_id').isInt({ min: 1 }).withMessage('ID de servicio inválido'),
         check('descripcion').optional().trim().notEmpty(),
         check('importe').optional().isFloat({ min: 0 }),
         check('activo').optional({ nullable: true }).isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
@@ -167,13 +167,13 @@ router.put(
 
 /**
  * @swagger
- * /api/servicios/{id_servicio}:
+ * /api/servicios/{servicio_id}:
  *   delete:
  *     summary: Elimina un servicio del sistema
  *     tags: [Servicios]
  *     parameters:
  *       - in: path
- *         name: id_servicio
+ *         name: servicio_id
  *         required: true
  *         schema:
  *           type: integer
@@ -187,9 +187,9 @@ router.put(
  *         description: Error interno del servidor
  */
 router.delete(
-    '/:id_servicio',
+    '/:servicio_id',
     authRoleMiddleware(['empleado', 'administrador']),
-    [param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
+    [param('servicio_id').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
     validation,
     serviciosController.c_Delete
 );

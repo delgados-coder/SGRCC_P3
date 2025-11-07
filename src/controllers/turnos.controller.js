@@ -5,7 +5,6 @@ const c_Browse = async (req, res) => {
   try {
     console.log('Ejecutando método: c_BROWSE (todos los registros de turnos)');
 
-    // Permite filtrar solo activos si se pasa query ?activo=1 o ?activo=0
     const filtros = {};
     if (req.query.activo !== undefined) {
       filtros.activo = req.query.activo == '1' ? 1 : 0;
@@ -58,7 +57,7 @@ const c_Add = async (req, res) => {
     orden,
     hora_desde,
     hora_hasta,
-    activo: activo == 0 ? 0 : 1, // si no se envía, se asume activo (1)
+    activo: activo == 0 ? 0 : 1, 
   };
 
   try {
