@@ -1,0 +1,992 @@
+{
+  "name": "SGRCC",
+  "version": "1",
+  "items": [
+    {
+      "type": "folder",
+      "name": "AUTH",
+      "filename": "AUTH",
+      "seq": 1,
+      "root": {
+        "request": {
+          "auth": {
+            "mode": "inherit"
+          }
+        },
+        "meta": {
+          "name": "AUTH",
+          "seq": 1
+        }
+      },
+      "items": [
+        {
+          "type": "http",
+          "name": "Login",
+          "filename": "Login.bru",
+          "seq": 1,
+          "settings": {
+            "encodeUrl": true,
+            "timeout": 0
+          },
+          "tags": [],
+          "request": {
+            "url": "http://localhost:3000/auth/login",
+            "method": "POST",
+            "headers": [],
+            "params": [],
+            "body": {
+              "mode": "json",
+              "json": "{\n\"nombre_usuario\":\"testing@gmail.com\",\n\"contrasenia\":\"123456\"\n}",
+              "formUrlEncoded": [],
+              "multipartForm": [],
+              "file": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "docs": "",
+            "auth": {
+              "mode": "inherit"
+            }
+          }
+        },
+        {
+          "type": "http",
+          "name": "Register",
+          "filename": "Register.bru",
+          "seq": 2,
+          "settings": {
+            "encodeUrl": true,
+            "timeout": 0
+          },
+          "tags": [],
+          "request": {
+            "url": "http://localhost:3000/auth/register",
+            "method": "POST",
+            "headers": [],
+            "params": [],
+            "body": {
+              "mode": "json",
+              "json": "{\n\"nombre\":\"NombreFalso\",\n\"apellido\":\"ApellidoFalso\",\n\"nombre_usuario\":\"AgenteSmith@gmail.com\",\n\"contrasenia\":\"123456\",\n\"tipo_usuario\":\"administrador\",\n\"celular\":\"2626262626262663\",\n\"foto\":\"test.jpg\"\n}",
+              "formUrlEncoded": [],
+              "multipartForm": [],
+              "file": []
+            },
+            "script": {},
+            "vars": {},
+            "assertions": [],
+            "tests": "",
+            "docs": "",
+            "auth": {
+              "mode": "inherit"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "folder",
+      "name": "Entidades",
+      "filename": "Entidades",
+      "seq": 2,
+      "root": {
+        "request": {
+          "auth": {
+            "mode": "inherit"
+          }
+        },
+        "meta": {
+          "name": "Entidades",
+          "seq": 2
+        }
+      },
+      "items": [
+        {
+          "type": "folder",
+          "name": "SALONES",
+          "filename": "SALONES",
+          "seq": 5,
+          "root": {
+            "request": {
+              "auth": {
+                "mode": "inherit"
+              }
+            },
+            "meta": {
+              "name": "SALONES",
+              "seq": 5
+            }
+          },
+          "items": [
+            {
+              "type": "http",
+              "name": "Actualizar SERVICIO",
+              "filename": "Actualizar SERVICIO.bru",
+              "seq": 4,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/salones/5",
+                "method": "PUT",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"titulo\": \"Cancha Fútbol 7\",\n  \"direccion\": \"Alberdi 12345678\",\n  \"latitud\": null,\n  \"longitud\": null,\n  \"capacidad\": 1,\n  \"importe\": \"99999.00\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Crear SERVICIO",
+              "filename": "Crear SERVICIO.bru",
+              "seq": 3,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/salones",
+                "method": "POST",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"titulo\": \"Cancha Fútbol 5\",\n  \"direccion\": \"Alberdi 300\",\n  \"latitud\": null,\n  \"longitud\": null,\n  \"capacidad\": 50,\n  \"importe\": \"150000.00\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Delete TURNOS",
+              "filename": "Delete TURNOS.bru",
+              "seq": 6,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/salones/5",
+                "method": "DELETE",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "SoftDelete SERVICIO",
+              "filename": "SoftDelete SERVICIO.bru",
+              "seq": 5,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/salones/6/1",
+                "method": "PATCH",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER por ID",
+              "filename": "VER por ID.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/salones/3",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER TODOS SERV",
+              "filename": "VER TODOS SERV.bru",
+              "seq": 1,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/salones",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "USUARIOS",
+          "filename": "USUARIOS",
+          "seq": 4,
+          "root": {
+            "request": {
+              "auth": {
+                "mode": "inherit"
+              }
+            },
+            "meta": {
+              "name": "USUARIOS",
+              "seq": 4
+            }
+          },
+          "items": [
+            {
+              "type": "http",
+              "name": "Actualizar SERVICIO",
+              "filename": "Actualizar SERVICIO.bru",
+              "seq": 4,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/usuarios/10",
+                "method": "PUT",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"nombre\": \"Aplaudidores Profesionales\",\n  \"descripcion\": \"Gente que va a hacer ruido con sus palmas\",\n  \"importe\": 12345,\n  \"tipo_servicio\": \"Servicio\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Crear SERVICIO",
+              "filename": "Crear SERVICIO.bru",
+              "seq": 3,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/usuarios",
+                "method": "POST",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"nombre\": \"Catering infantil\",\n  \"descripcion\": \"Servicio de comida para niños y adultos\",\n  \"importe\": 99999,\n  \"tipo_servicio\": \"Catering\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Delete TURNOS",
+              "filename": "Delete TURNOS.bru",
+              "seq": 6,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/usuarios/5",
+                "method": "DELETE",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "SoftDelete SERVICIO",
+              "filename": "SoftDelete SERVICIO.bru",
+              "seq": 5,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/usuarios/2/0",
+                "method": "PATCH",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER por ID",
+              "filename": "VER por ID.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/usuarios/3",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER TODOS SERV",
+              "filename": "VER TODOS SERV.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/usuarios",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "TURNOS",
+          "filename": "TURNOS",
+          "seq": 5,
+          "root": {
+            "request": {
+              "auth": {
+                "mode": "inherit"
+              }
+            },
+            "meta": {
+              "name": "TURNOS",
+              "seq": 5
+            }
+          },
+          "items": [
+            {
+              "type": "http",
+              "name": "Actualizar TURNO",
+              "filename": "Actualizar TURNO.bru",
+              "seq": 4,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/turnos/5",
+                "method": "PUT",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"orden\": 8,\n  \"hora_desde\": \"15:00:00\",\n  \"hora_hasta\": \"17:00:00\",\n  \"activo\": 0\n}\n",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsIm5vbWJyZV91c3VhcmlvIjoidGVzdGluZ0BnbWFpbC5jb20iLCJ0aXBvX3VzdWFyaW8iOiJhZG1pbmlzdHJhZG9yIiwiYWN0aXZvIjoxLCJpYXQiOjE3NjI1Mjc2NzEsImV4cCI6MTc2MjUzMTI3MX0.MRUbp2A5YHMdFURsPAbs-n9ILlKa1-tMxImKxOx36QI"
+                  }
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Crear TURNO",
+              "filename": "Crear TURNO.bru",
+              "seq": 3,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/turnos",
+                "method": "POST",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"orden\": 6,\n  \"hora_desde\": \"21:00:00\",\n  \"hora_hasta\": \"23:00:00\",\n  \"activo\": 1\n}\n",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsIm5vbWJyZV91c3VhcmlvIjoidGVzdGluZ0BnbWFpbC5jb20iLCJ0aXBvX3VzdWFyaW8iOiJhZG1pbmlzdHJhZG9yIiwiYWN0aXZvIjoxLCJpYXQiOjE3NjI1Mjc2NzEsImV4cCI6MTc2MjUzMTI3MX0.MRUbp2A5YHMdFURsPAbs-n9ILlKa1-tMxImKxOx36QI"
+                  }
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Delete TURNOS",
+              "filename": "Delete TURNOS.bru",
+              "seq": 6,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/turnos/510",
+                "method": "DELETE",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsIm5vbWJyZV91c3VhcmlvIjoidGVzdGluZ0BnbWFpbC5jb20iLCJ0aXBvX3VzdWFyaW8iOiJhZG1pbmlzdHJhZG9yIiwiYWN0aXZvIjoxLCJpYXQiOjE3NjI1Mjc2NzEsImV4cCI6MTc2MjUzMTI3MX0.MRUbp2A5YHMdFURsPAbs-n9ILlKa1-tMxImKxOx36QI"
+                  }
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "SoftDelete TURNO",
+              "filename": "SoftDelete TURNO.bru",
+              "seq": 5,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/turnos/5/0",
+                "method": "PATCH",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsIm5vbWJyZV91c3VhcmlvIjoidGVzdGluZ0BnbWFpbC5jb20iLCJ0aXBvX3VzdWFyaW8iOiJhZG1pbmlzdHJhZG9yIiwiYWN0aXZvIjoxLCJpYXQiOjE3NjI1Mjc2NzEsImV4cCI6MTc2MjUzMTI3MX0.MRUbp2A5YHMdFURsPAbs-n9ILlKa1-tMxImKxOx36QI"
+                  }
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER por ID",
+              "filename": "VER por ID.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/turnos/5",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsIm5vbWJyZV91c3VhcmlvIjoidGVzdGVyQGdtYWlsLmNvbSIsInRpcG9fdXN1YXJpbyI6ImNsaWVudGUiLCJhY3Rpdm8iOjEsImlhdCI6MTc2MjUyNzE4NCwiZXhwIjoxNzYyNTMwNzg0fQ.v60jwBiISG2bFnRc4SUbzMcKy6y6berbas-fVS_2MAs"
+                  }
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER TODOS",
+              "filename": "VER TODOS.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/turnos",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "bearer",
+                  "bearer": {
+                    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsIm5vbWJyZV91c3VhcmlvIjoidGVzdGVyQGdtYWlsLmNvbSIsInRpcG9fdXN1YXJpbyI6ImNsaWVudGUiLCJhY3Rpdm8iOjEsImlhdCI6MTc2MjUyNzE4NCwiZXhwIjoxNzYyNTMwNzg0fQ.v60jwBiISG2bFnRc4SUbzMcKy6y6berbas-fVS_2MAs"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "folder",
+          "name": "SERVICIOS",
+          "filename": "SERVICIOS",
+          "seq": 6,
+          "root": {
+            "request": {
+              "auth": {
+                "mode": "inherit"
+              }
+            },
+            "meta": {
+              "name": "SERVICIOS",
+              "seq": 6
+            }
+          },
+          "items": [
+            {
+              "type": "http",
+              "name": "Actualizar SERVICIO",
+              "filename": "Actualizar SERVICIO.bru",
+              "seq": 4,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/servicios/10",
+                "method": "PUT",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"nombre\": \"Aplaudidores Profesionales\",\n  \"descripcion\": \"Gente que va a hacer ruido con sus palmas\",\n  \"importe\": 12345,\n  \"tipo_servicio\": \"Servicio\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Crear SERVICIO",
+              "filename": "Crear SERVICIO.bru",
+              "seq": 3,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/servicios",
+                "method": "POST",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "{\n  \"nombre\": \"Catering infantil\",\n  \"descripcion\": \"Servicio de comida para niños y adultos\",\n  \"importe\": 99999,\n  \"tipo_servicio\": \"Catering\"\n}",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "Delete TURNOS",
+              "filename": "Delete TURNOS.bru",
+              "seq": 6,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/servicios/5",
+                "method": "DELETE",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "SoftDelete SERVICIO",
+              "filename": "SoftDelete SERVICIO.bru",
+              "seq": 5,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/servicios/2/0",
+                "method": "PATCH",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER por ID",
+              "filename": "VER por ID.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/servicios/3",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            },
+            {
+              "type": "http",
+              "name": "VER TODOS SERV",
+              "filename": "VER TODOS SERV.bru",
+              "seq": 2,
+              "settings": {
+                "encodeUrl": true,
+                "timeout": 0
+              },
+              "tags": [],
+              "request": {
+                "url": "http://localhost:3000/api/servicios",
+                "method": "GET",
+                "headers": [],
+                "params": [],
+                "body": {
+                  "mode": "json",
+                  "json": "",
+                  "formUrlEncoded": [],
+                  "multipartForm": [],
+                  "file": []
+                },
+                "script": {},
+                "vars": {},
+                "assertions": [],
+                "tests": "",
+                "docs": "",
+                "auth": {
+                  "mode": "inherit"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "environments": [],
+  "root": {
+    "request": {
+      "auth": {
+        "mode": "bearer",
+        "bearer": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsIm5vbWJyZV91c3VhcmlvIjoidGVzdGluZ0BnbWFpbC5jb20iLCJ0aXBvX3VzdWFyaW8iOiJhZG1pbmlzdHJhZG9yIiwiYWN0aXZvIjoxLCJpYXQiOjE3NjI1NDcwMzIsImV4cCI6MTc2MjU1MDYzMn0.Lx3QNaIn7zGlYfysYkQOUm5LxJLkMpSPBaRtGIJRfOc"
+        }
+      }
+    }
+  },
+  "brunoConfig": {
+    "version": "1",
+    "name": "SGRCC",
+    "type": "collection",
+    "ignore": [
+      "node_modules",
+      ".git"
+    ],
+    "size": 0.008203506469726562,
+    "filesCount": 33
+  }
+}
