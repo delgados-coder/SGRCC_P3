@@ -2,9 +2,9 @@
 // Ejecutar con: `npm run client`
 
 const axios = require('axios');
-const { CLIENT_BASE_URL } = require('../src/config/env.config.js');
+const env = require('../src/config/env.config.js');
 
-const BASE_URL = CLIENT_BASE_URL;
+const BASE_URL = (env && env.CLIENT_BASE_URL) || `http://localhost:${env?.PORT || 3000}`;
 
 const logTitle = (title) => {
     console.log('\n' + '='.repeat(80));
@@ -13,6 +13,24 @@ const logTitle = (title) => {
 };
 
 const pretty = (obj) => JSON.stringify(obj, null, 2);
+
+async function refreshAccessToken(refreshToken) {
+    const res = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
+    return res.data.accessToken;
+}
+
+async function logout(refreshToken) {
+    try {
+        const res = await axios.post(`${BASE_URL}/auth/logout`, { refreshToken });
+        console.log(`Status: ${res.status}`, pretty(res.data));
+    } catch (err) {
+        if (err.response) {
+            console.log(`Status: ${err.response.status}`, pretty(err.response.data));
+        } else {
+            console.error(err.message);
+        }
+    }
+}
 
 async function main() {
     try {
@@ -39,10 +57,13 @@ async function main() {
             contrasenia: nuevoUsuario.contrasenia,
         });
         console.log(`Status: ${res.status}`, pretty(res.data));
-        const token = res.data.token;
-        const auth = { headers: { Authorization: `Bearer ${token}` } };
 
-        // Llamados protegidos que un "cliente" puede hacer
+        // El backend devuelve { accessToken, refreshToken }
+        let accessToken = res.data.accessToken;
+        const refreshToken = res.data.refreshToken;
+        let auth = { headers: { Authorization: `Bearer ${accessToken}` } };
+
+        // Endpoints protegidos accesibles para rol "cliente"
         logTitle('3) GET /api/salones (cliente puede listar)');
         res = await axios.get(`${BASE_URL}/api/salones`, auth);
         console.log(`Status: ${res.status}`, pretty(res.data));
@@ -55,8 +76,8 @@ async function main() {
         res = await axios.get(`${BASE_URL}/api/turnos`, auth);
         console.log(`Status: ${res.status}`, pretty(res.data));
 
-        // Dependiendo de sus permisos / datos sembrados, el cliente puede listar reservas
-        logTitle('6) GET /api/reservas (cliente puede listar)');
+        // Listado de reservas (según permisos/datos)
+        logTitle('6) GET /api/reservas (cliente puede listar si está permitido)');
         try {
             res = await axios.get(`${BASE_URL}/api/reservas`, auth);
             console.log(`Status: ${res.status}`, pretty(res.data));
@@ -68,7 +89,7 @@ async function main() {
             }
         }
 
-        // Ejemplo de intento de acción no permitida (debería dar 403 por rol)
+        // Intento de acción no permitida (debería dar 403)
         logTitle('7) POST /api/salones (cliente NO debería poder crear -> 403)');
         try {
             res = await axios.post(
@@ -89,6 +110,27 @@ async function main() {
                 console.error(err.message);
             }
         }
+
+        // Demostración de refresh de token y reintento de endpoint protegido
+        logTitle('8) /auth/refresh -> obtener nuevo accessToken y volver a consumir un endpoint protegido');
+        try {
+            accessToken = await refreshAccessToken(refreshToken);
+            auth = { headers: { Authorization: `Bearer ${accessToken}` } };
+
+            // Reintento de un endpoint protegido usando el nuevo accessToken
+            res = await axios.get(`${BASE_URL}/api/salones`, auth);
+            console.log(`Status: ${res.status}`, pretty(res.data));
+        } catch (err) {
+            if (err.response) {
+                console.log(`Status: ${err.response.status}`, pretty(err.response.data));
+            } else {
+                console.error(err.message);
+            }
+        }
+
+        // Cierre de sesión (invalida el refresh token en el servidor)
+        logTitle('9) /auth/logout -> invalidar refreshToken');
+        await logout(refreshToken);
 
         console.log('\nListo ✅ — El cliente de prueba terminó.\n');
     } catch (err) {

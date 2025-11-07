@@ -153,4 +153,4 @@ const refresh = (req, res) => {
 };
 
 //------------------------------------------------------------------------------------------------------/
-module.exports = { login, register, logout, refresh, refreshTokens};
+module.exports = { login, register, logout, refresh, refreshTokens };

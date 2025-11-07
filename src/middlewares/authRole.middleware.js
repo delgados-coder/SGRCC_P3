@@ -12,7 +12,7 @@ const authRoleMiddleware = (allowedRoles) => {
     }
 
     jwt.verify(token, SECRET_KEY, (error, token_decoded) => {
-      
+
       if (error) {
         return res.status(403).json({ message: 'Token inválido o expirado.' });
       }

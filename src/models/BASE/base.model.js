@@ -53,20 +53,20 @@ const m_base_INSERT = (tabla, datos) => {
     if (!tabla || typeof datos !== 'object' || Array.isArray(datos)) {
       return rechazar(new Error('Parámetros inválidos para m_INSERT'));
     }
-    
+
     const columnas = Object.keys(datos);
     const valores = Object.values(datos);
     const placeholders = columnas.map(() => '?').join(', '); // → "?, ?, ?"
-    
+
     const consulta_SQL = `INSERT INTO ${tabla} (${columnas.join(', ')}) VALUES (${placeholders})`;
 
     console.log(`La consulta SQL = ${consulta_SQL}`)
     DBconnection.query(consulta_SQL, valores, (error, resultado) => {
       if (error) {
         console.error('Error en m_INSERT:', error);
-        rechazar(error); 
+        rechazar(error);
       } else {
-        resolver(resultado); 
+        resolver(resultado);
       }
     });
   });
@@ -104,9 +104,9 @@ const m_base_DELETE = (tabla, filtros = {}) => {
         return reject(err);
       }
       if (results.affectedRows === 0) {
-        resolve(null);  
+        resolve(null);
       } else {
-        resolve(results);  
+        resolve(results);
       }
     });
   });
@@ -117,14 +117,14 @@ const m_base_DELETE = (tabla, filtros = {}) => {
 // UPDATE genérico
 const m_base_UPDATE = (tabla, datos, filtros = {}) => {
   return new Promise((resolve, reject) => {
-    
+
     if (typeof datos !== 'object' || Array.isArray(datos) || Object.keys(datos).length === 0) {
       return reject(new Error('Se deben proporcionar datos válidos para actualizar'));
     }
 
     const setStr = [];
     const valores = Object.values(datos);
-    
+
     for (let campo in datos) {
       setStr.push(`${campo} = ?`);
     }
@@ -149,16 +149,16 @@ const m_base_UPDATE = (tabla, datos, filtros = {}) => {
     }
 
     console.log(`La consulta SQL = ${consulta_SQL}`);
-    
+
     DBconnection.query(consulta_SQL, valores, (err, results) => {
       if (err) {
         console.error('Error en la consulta UPDATE:', err);
         return reject(err);
       }
       if (results.affectedRows === 0) {
-        resolve(null);  
+        resolve(null);
       } else {
-        resolve(results);  
+        resolve(results);
       }
     });
   });
@@ -220,4 +220,4 @@ const m_base_SELECT_JOIN = (tabla, columnas = '*', joins = [], filtros = {}, ord
 
 
 
-module.exports = {m_base_SELECT, m_base_INSERT, m_base_DELETE, m_base_UPDATE, m_base_SELECT_JOIN};
+module.exports = { m_base_SELECT, m_base_INSERT, m_base_DELETE, m_base_UPDATE, m_base_SELECT_JOIN };

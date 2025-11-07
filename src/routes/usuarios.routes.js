@@ -55,8 +55,8 @@ const validation = require('../middlewares/validation.middleware.js');
  *         usuario_id: 1
  *         nombre: Juan
  *         apellido: Pérez
- *         nombre_usuario: jperez
- *         contrasenia: 12345
+ *         nombre_usuario: jperez@correo.com
+ *         contrasenia: 123456
  *         tipo_usuario: empleado
  *         celular: "3515555555"
  *         foto: "foto.jpg"
@@ -83,7 +83,11 @@ const validation = require('../middlewares/validation.middleware.js');
  *       500:
  *         description: Error del servidor
  */
-router.get('/', authRoleMiddleware(['empleado','administrador']), usuariosController.c_Browse);
+router.get(
+    '/',
+    authRoleMiddleware(['empleado', 'administrador']),
+    usuariosController.c_Browse
+);
 
 /**
  * @swagger
@@ -110,7 +114,13 @@ router.get('/', authRoleMiddleware(['empleado','administrador']), usuariosContro
  *       500:
  *         description: Error del servidor
  */
-router.get('/:id_usuario', authRoleMiddleware(['empleado','administrador']), usuariosController.c_Read);
+router.get(
+    '/:id_usuario',
+    authRoleMiddleware(['empleado', 'administrador']),
+    [param('id_usuario').isInt({ min: 1 }).withMessage('id_usuario inválido')],
+    validation,
+    usuariosController.c_Read
+);
 
 /**
  * @swagger
@@ -131,8 +141,23 @@ router.get('/:id_usuario', authRoleMiddleware(['empleado','administrador']), usu
  *         description: Datos faltantes o inválidos
  *       500:
  *         description: Error del servidor
- */            
-router.post('/', authRoleMiddleware(['administrador']), usuariosController.c_Add);
+ */
+router.post(
+    '/',
+    authRoleMiddleware(['administrador']),
+    [
+        check('nombre').trim().notEmpty().withMessage('nombre requerido'),
+        check('apellido').trim().notEmpty().withMessage('apellido requerido'),
+        check('nombre_usuario').isEmail().withMessage('email inválido'),
+        check('contrasenia').isLength({ min: 6 }).withMessage('contraseña mínimo 6 caracteres'),
+        check('tipo_usuario').isIn(['cliente', 'empleado', 'administrador']).withMessage('tipo de usuario inválido'),
+        check('celular').optional({ nullable: true, checkFalsy: true }).isString(),
+        check('foto').optional({ nullable: true, checkFalsy: true }).isString(),
+        check('activo').optional({ nullable: true }).isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
+    ],
+    validation,
+    usuariosController.c_Add
+);
 
 /**
  * @swagger
@@ -163,7 +188,23 @@ router.post('/', authRoleMiddleware(['administrador']), usuariosController.c_Add
  *       500:
  *         description: Error al actualizar usuario
  */
-router.put('/:id_usuario', authRoleMiddleware(['administrador']), usuariosController.c_Edit);
+router.put(
+    '/:id_usuario',
+    authRoleMiddleware(['administrador']),
+    [
+        param('id_usuario').isInt({ min: 1 }).withMessage('ID de usuario inválido'),
+        check('nombre').optional().trim().isLength({ min: 2, max: 50 }),
+        check('apellido').optional().trim().isLength({ min: 2, max: 50 }),
+        check('nombre_usuario').optional().isEmail(),
+        check('contrasenia').optional().isLength({ min: 6 }),
+        check('tipo_usuario').optional().isIn(['cliente', 'empleado', 'administrador']),
+        check('celular').optional().isString(),
+        check('foto').optional().isString(),
+        check('activo').optional({ nullable: true }).isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
+    ],
+    validation,
+    usuariosController.c_Edit
+);
 
 /**
  * @swagger
@@ -186,7 +227,13 @@ router.put('/:id_usuario', authRoleMiddleware(['administrador']), usuariosContro
  *       500:
  *         description: Error al eliminar usuario
  */
-router.delete('/:id_usuario', authRoleMiddleware(['administrador']), usuariosController.c_Delete);
+router.delete(
+    '/:id_usuario',
+    authRoleMiddleware(['administrador']),
+    [param('id_usuario').isInt({ min: 1 }).withMessage('ID de usuario inválido')],
+    validation,
+    usuariosController.c_Delete
+);
 
 /**
  * @swagger
@@ -218,56 +265,8 @@ router.delete('/:id_usuario', authRoleMiddleware(['administrador']), usuariosCon
  *       500:
  *         description: Error del servidor
  */
-router.patch('/softdelete/:id_usuario/:activo', authRoleMiddleware(['administrador']), usuariosController.c_SoftDelete);
-
-module.exports = router;
-router.get('/', authRoleMiddleware(['empleado', 'administrador']), usuariosController.c_Browse);
-router.get('/:id_usuario',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [param('id_usuario').isInt({ min: 1 }).withMessage('id_usuario inválido')],
-    validation,
-    usuariosController.c_Read
-);
-
-router.post('/',
-    authRoleMiddleware(['administrador']),
-    [
-        check('nombre').trim().notEmpty().withMessage('nombre requerido'),
-        check('apellido').trim().notEmpty().withMessage('apellido requerido'),
-        check('nombre_usuario').isEmail().withMessage('email inválido'),
-        check('contrasenia').isLength({ min: 6 }).withMessage('contraseña mínimo 6 caracteres'),
-        check('tipo_usuario').isIn(['cliente', 'empleado', 'administrador']).withMessage('tipo de usuario inválido'),
-        check('celular').optional({ nullable: true, checkFalsy: true }).isString(),
-        check('foto').optional({ nullable: true, checkFalsy: true }).isString(),
-    ],
-    validation,
-    usuariosController.c_Add
-);
-
-router.put('/:id_usuario',
-    authRoleMiddleware(['administrador']),
-    [
-        param('id_usuario').isInt({ min: 1 }).withMessage('ID de usuario inválido'),
-        check('nombre').optional().trim().isLength({ min: 2, max: 50 }),
-        check('apellido').optional().trim().isLength({ min: 2, max: 50 }),
-        check('nombre_usuario').optional().isEmail(),
-        check('contrasenia').optional().isLength({ min: 6 }),
-        check('tipo_usuario').optional().isIn(['cliente', 'empleado', 'administrador']),
-        check('celular').optional().isString(),
-        check('foto').optional().isString(),
-    ],
-    validation,
-    usuariosController.c_Edit
-);
-
-router.delete('/:id_usuario',
-    authRoleMiddleware(['administrador']),
-    [param('id_usuario').isInt({ min: 1 }).withMessage('ID deusuario inválido')],
-    validation,
-    usuariosController.c_Delete
-);
-
-router.patch('/softdelete/:id_usuario/:activo',
+router.patch(
+    '/softdelete/:id_usuario/:activo',
     authRoleMiddleware(['administrador']),
     [
         param('id_usuario').isInt({ min: 1 }).withMessage('ID de usuario inválido'),

@@ -8,7 +8,6 @@ const validation = require('../middlewares/validation.middleware.js');
 //-----------Rutas BREAD -----------
 // Browse, Read, Edit, Add, Delete
 
-
 /**
  * @swagger
  * tags:
@@ -30,8 +29,11 @@ const validation = require('../middlewares/validation.middleware.js');
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), serviciosController.c_Browse); 
-
+router.get(
+    '/',
+    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+    serviciosController.c_Browse
+);
 
 /**
  * @swagger
@@ -54,7 +56,13 @@ router.get('/', authRoleMiddleware(['cliente','empleado','administrador']), serv
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/:id_servicio', authRoleMiddleware(['cliente','empleado','administrador']), serviciosController.c_Read); 
+router.get(
+    '/:id_servicio',
+    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+    [param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
+    validation,
+    serviciosController.c_Read
+);
 
 /**
  * @swagger
@@ -69,24 +77,21 @@ router.get('/:id_servicio', authRoleMiddleware(['cliente','empleado','administra
  *           schema:
  *             type: object
  *             properties:
- *               nombre:
- *                 type: string
- *                 description: Nombre del servicio
  *               descripcion:
  *                 type: string
  *                 description: Descripción del servicio
- *               precio:
+ *               importe:
  *                 type: number
  *                 format: float
- *                 description: Precio del servicio
- *               tipo_servicio:
- *                 type: string
- *                 description: "Categoría o tipo del servicio (ejemplo: catering, animación, decoración)"
+ *                 description: Importe del servicio
+ *               activo:
+ *                 type: integer
+ *                 enum: [0,1]
+ *                 description: Estado del servicio (opcional, por defecto 1)
  *             example:
- *               nombre: "Catering infantil"
- *               descripcion: "Servicio de comida para niños y adultos"
- *               precio: 25000
- *               tipo_servicio: "Catering"
+ *               descripcion: "Catering infantil"
+ *               importe: 25000
+ *               activo: 1
  *     responses:
  *       201:
  *         description: Servicio creado correctamente
@@ -95,7 +100,17 @@ router.get('/:id_servicio', authRoleMiddleware(['cliente','empleado','administra
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', authRoleMiddleware(['empleado','administrador']), serviciosController.c_Add); 
+router.post(
+    '/',
+    authRoleMiddleware(['empleado', 'administrador']),
+    [
+        check('descripcion').trim().notEmpty().withMessage('Descripcion requerida'),
+        check('importe').isFloat({ min: 0 }).withMessage('El importe debe ser numérico >= 0'),
+        check('activo').optional({ nullable: true }).isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
+    ],
+    validation,
+    serviciosController.c_Add
+);
 
 /**
  * @swagger
@@ -117,20 +132,18 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), serviciosCont
  *           schema:
  *             type: object
  *             properties:
- *               nombre:
- *                 type: string
  *               descripcion:
  *                 type: string
- *               precio:
+ *               importe:
  *                 type: number
  *                 format: float
- *               tipo_servicio:
- *                 type: string
+ *               activo:
+ *                 type: integer
+ *                 enum: [0,1]
  *             example:
- *               nombre: "Animación con juegos nuevos"
- *               descripcion: "Animadores y juegos interactivos"
- *               precio: 28000
- *               tipo_servicio: "Animación"
+ *               descripcion: "Animación con juegos nuevos"
+ *               importe: 28000
+ *               activo: 1
  *     responses:
  *       200:
  *         description: Servicio actualizado correctamente
@@ -139,8 +152,18 @@ router.post('/', authRoleMiddleware(['empleado','administrador']), serviciosCont
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id_servicio', authRoleMiddleware(['empleado','administrador']), serviciosController.c_Edit); 
-
+router.put(
+    '/:id_servicio',
+    authRoleMiddleware(['empleado', 'administrador']),
+    [
+        param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido'),
+        check('descripcion').optional().trim().notEmpty(),
+        check('importe').optional().isFloat({ min: 0 }),
+        check('activo').optional({ nullable: true }).isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
+    ],
+    validation,
+    serviciosController.c_Edit
+);
 
 /**
  * @swagger
@@ -163,38 +186,8 @@ router.put('/:id_servicio', authRoleMiddleware(['empleado','administrador']), se
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id_servicio', authRoleMiddleware(['empleado','administrador']), serviciosController.c_Delete); 
-router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), serviciosController.c_Browse);
-
-router.get('/:id_servicio',
-    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
-    validation,
-    serviciosController.c_Read
-);
-
-router.post('/',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [
-        check('descripcion').trim().notEmpty().withMessage('Descripcion requerida'),
-        check('importe').isFloat({ min: 0 }).withMessage('El importe debe ser numérico >= 0'),
-    ],
-    validation,
-    serviciosController.c_Add
-);
-
-router.put('/:id_servicio',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [
-        param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido'),
-        check('descripcion').optional().trim().notEmpty(),
-        check('importe').optional().isFloat({ min: 0 }),
-    ],
-    validation,
-    serviciosController.c_Edit
-);
-
-router.delete('/:id_servicio',
+router.delete(
+    '/:id_servicio',
     authRoleMiddleware(['empleado', 'administrador']),
     [param('id_servicio').isInt({ min: 1 }).withMessage('ID de servicio inválido')],
     validation,
