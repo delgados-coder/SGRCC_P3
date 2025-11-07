@@ -1,3 +1,5 @@
+// Módulo de rutas de turnos
+
 const express = require('express');
 const { check, param } = require('express-validator');
 const router = express.Router();
@@ -5,11 +7,12 @@ const turnosController = require('../controllers/turnos.controller.js');
 const authRoleMiddleware = require('../middlewares/authRole.middleware.js');
 const validation = require('../middlewares/validation.middleware.js');
 
-const hora = (campo) => check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(`${campo} debe ser HH:MM:SS`);
+// Valida hora en formato HH:MM:SS
+const hora = (campo) =>
+  check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(`${campo} debe ser HH:MM:SS`);
 
-//-----------Rutas BREAD -----------
+//----------- Rutas BREAD -----------
 // Browse, Read, Edit, Add, Delete
-
 
 /**
  * @swagger
@@ -18,6 +21,7 @@ const hora = (campo) => check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(
  *   description: Operaciones de gestión de turnos
  */
 
+// --------------------- Listar todos los TURNOS ---------------------
 /**
  * @swagger
  * /api/turnos:
@@ -27,42 +31,18 @@ const hora = (campo) => check(campo).matches(/^\d{2}:\d{2}:\d{2}$/).withMessage(
  *     responses:
  *       200:
  *         description: Lista de turnos obtenida correctamente
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   turno_id:
- *                     type: integer
- *                     example: 1
- *                   orden:
- *                     type: integer
- *                     example: 1
- *                   hora_desde:
- *                     type: string
- *                     example: "12:00:00"
- *                   hora_hasta:
- *                     type: string
- *                     example: "14:00:00"
- *                   activo:
- *                     type: integer
- *                     example: 1
- *                   creado:
- *                     type: string
- *                     example: "2025-08-19 21:44:19"
- *                   modificado:
- *                     type: string
- *                     example: "2025-08-19 21:44:19"
  *       404:
  *         description: No se encontraron turnos
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), turnosController.c_Browse);
+router.get(
+  '/',
+  authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+  turnosController.c_Browse
+);
 
-
+// --------------------- Obtener un turno por ID ---------------------
 /**
  * @swagger
  * /api/turnos/{turno_id}:
@@ -79,40 +59,20 @@ router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), tu
  *     responses:
  *       200:
  *         description: Turno encontrado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 turno_id:
- *                   type: integer
- *                   example: 1
- *                 orden:
- *                   type: integer
- *                   example: 1
- *                 hora_desde:
- *                   type: string
- *                   example: "12:00:00"
- *                 hora_hasta:
- *                   type: string
- *                   example: "14:00:00"
- *                 activo:
- *                   type: integer
- *                   example: 1
- *                 creado:
- *                   type: string
- *                   example: "2025-08-19 21:44:19"
- *                 modificado:
- *                   type: string
- *                   example: "2025-08-19 21:44:19"
  *       404:
  *         description: Turno no encontrado
  *       500:
  *         description: Error interno del servidor
  */
-router.get('/:id_turno', authRoleMiddleware(['cliente', 'empleado', 'administrador']), turnosController.c_Read);
+router.get(
+  '/:turno_id',
+  authRoleMiddleware(['cliente', 'empleado', 'administrador']),
+  [param('turno_id').isInt({ min: 1 }).withMessage('ID de turno inválido')],
+  validation,
+  turnosController.c_Read
+);
 
-
+// --------------------- CREAR TURNO ---------------------
 /**
  * @swagger
  * /api/turnos:
@@ -132,16 +92,12 @@ router.get('/:id_turno', authRoleMiddleware(['cliente', 'empleado', 'administrad
  *             properties:
  *               orden:
  *                 type: integer
- *                 example: 1
  *               hora_desde:
  *                 type: string
- *                 example: "12:00:00"
  *               hora_hasta:
  *                 type: string
- *                 example: "14:00:00"
  *               activo:
  *                 type: integer
- *                 example: 1
  *     responses:
  *       201:
  *         description: Turno creado correctamente
@@ -150,8 +106,23 @@ router.get('/:id_turno', authRoleMiddleware(['cliente', 'empleado', 'administrad
  *       500:
  *         description: Error interno del servidor
  */
-router.post('/', authRoleMiddleware(['empleado', 'administrador']), turnosController.c_Add);
+router.post(
+  '/',
+  authRoleMiddleware(['empleado', 'administrador']),
+  [
+    check('orden').isInt({ min: 1 }).withMessage('orden debe ser un entero >= 1'),
+    hora('hora_desde'),
+    hora('hora_hasta'),
+    check('hora_hasta').custom((hasta, { req }) => {
+      return hasta > req.body.hora_desde || 'La hora de finalización debe ser mayor que la hora de inicio';
+    }),
+    check('activo').optional().isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
+  ],
+  validation,
+  turnosController.c_Add
+);
 
+// --------------------- Actualizar el TURNO ---------------------
 /**
  * @swagger
  * /api/turnos/{turno_id}:
@@ -164,7 +135,6 @@ router.post('/', authRoleMiddleware(['empleado', 'administrador']), turnosContro
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID del turno a actualizar
  *     requestBody:
  *       required: true
  *       content:
@@ -174,16 +144,12 @@ router.post('/', authRoleMiddleware(['empleado', 'administrador']), turnosContro
  *             properties:
  *               orden:
  *                 type: integer
- *                 example: 2
  *               hora_desde:
  *                 type: string
- *                 example: "15:00:00"
  *               hora_hasta:
  *                 type: string
- *                 example: "17:00:00"
  *               activo:
  *                 type: integer
- *                 example: 1
  *     responses:
  *       200:
  *         description: Turno actualizado correctamente
@@ -192,13 +158,32 @@ router.post('/', authRoleMiddleware(['empleado', 'administrador']), turnosContro
  *       500:
  *         description: Error interno del servidor
  */
-router.put('/:id_turno', authRoleMiddleware(['empleado', 'administrador']), turnosController.c_Edit);
+router.put(
+  '/:turno_id',
+  authRoleMiddleware(['empleado', 'administrador']),
+  [
+    param('turno_id').isInt({ min: 1 }).withMessage('ID de turno inválido'),
+    check('orden').optional().isInt({ min: 1 }),
+    hora('hora_desde').optional(),
+    hora('hora_hasta').optional(),
+    check('hora_hasta')
+      .optional()
+      .custom((hasta, { req }) => {
+        if (!req.body.hora_desde) return true;
+        return hasta > req.body.hora_desde || 'La hora de finalización debe ser mayor que la hora de inicio';
+      }),
+    check('activo').optional().isInt({ min: 0, max: 1 }).withMessage('activo debe ser 0 o 1'),
+  ],
+  validation,
+  turnosController.c_Edit
+);
 
+// --------------------- Eliminar Turno --------------------
 /**
  * @swagger
  * /api/turnos/{turno_id}:
  *   delete:
- *     summary: Elimina un turno del sistema
+ *     summary: Elimina un turno del sistema de forma permanente
  *     tags: [Turnos]
  *     parameters:
  *       - in: path
@@ -206,7 +191,6 @@ router.put('/:id_turno', authRoleMiddleware(['empleado', 'administrador']), turn
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID del turno a eliminar
  *     responses:
  *       200:
  *         description: Turno eliminado correctamente
@@ -215,52 +199,52 @@ router.put('/:id_turno', authRoleMiddleware(['empleado', 'administrador']), turn
  *       500:
  *         description: Error interno del servidor
  */
-router.delete('/:id_turno', authRoleMiddleware(['empleado', 'administrador']), turnosController.c_Delete);
-router.get('/', authRoleMiddleware(['cliente', 'empleado', 'administrador']), turnosController.c_Browse);
-
-router.get('/:id_turno',
-    authRoleMiddleware(['cliente', 'empleado', 'administrador']),
-    [param('id_turno').isInt({ min: 1 }).withMessage('ID de turno inválido')],
-    validation,
-    turnosController.c_Read
+router.delete(
+  '/:turno_id',
+  authRoleMiddleware(['empleado', 'administrador']),
+  [param('turno_id').isInt({ min: 1 }).withMessage('ID de turno inválido')],
+  validation,
+  turnosController.c_Delete
 );
 
-router.post('/',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [
-        check('orden').isInt({ min: 1 }).withMessage('El orden debe ser un entero >= 1'),
-        hora('hora_desde'),
-        hora('hora_hasta'),
-        check('hora_hasta').custom((hasta, { req }) => {
-            if (!req.body.hora_desde) return true;
-            return hasta > req.body.hora_desde || 'La hora de finalización debe ser mayor que la hora de inicio';
-        }),
-    ],
-    validation,
-    turnosController.c_Add
-);
-
-router.put('/:id_turno',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [
-        param('id_turno').isInt({ min: 1 }).withMessage('ID de turno inválido'),
-        check('orden').optional().isInt({ min: 1 }),
-        hora('hora_desde').optional(),
-        hora('hora_hasta').optional(),
-        check('hora_hasta').optional().custom((hasta, { req }) => {
-            if (!req.body.hora_desde) return true;
-            return hasta > req.body.hora_desde || 'La hora de finalización debe ser mayor que la hora de inicio';
-        }),
-    ],
-    validation,
-    turnosController.c_Edit
-);
-
-router.delete('/:id_turno',
-    authRoleMiddleware(['empleado', 'administrador']),
-    [param('id_turno').isInt({ min: 1 }).withMessage('ID de turno inválido')],
-    validation,
-    turnosController.c_Delete
+// --------------------- Activar o Desactivar Turno (SOFT DELETE) ---------------------
+/**
+ * @swagger
+ * /api/turnos/{turno_id}/{activo}:
+ *   patch:
+ *     summary: Activa o desactiva un turno
+ *     tags: [Turnos]
+ *     parameters:
+ *       - in: path
+ *         name: turno_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *       - in: path
+ *         name: activo
+ *         required: true
+ *         schema:
+ *           type: integer
+ *           enum: [0, 1]
+ *     responses:
+ *       200:
+ *         description: Estado del turno actualizado correctamente
+ *       400:
+ *         description: Valor de activo inválido
+ *       404:
+ *         description: Turno no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ */
+router.patch(
+  '/:turno_id/:activo',
+  authRoleMiddleware(['empleado', 'administrador']),
+  [
+    param('turno_id').isInt({ min: 1 }).withMessage('ID de turno inválido'),
+    param('activo').isIn(['0', '1']).withMessage('El valor de "activo" debe ser 0 o 1'),
+  ],
+  validation,
+  turnosController.c_SoftDelete
 );
 
 module.exports = router;
